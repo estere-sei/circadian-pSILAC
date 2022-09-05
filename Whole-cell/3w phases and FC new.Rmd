@@ -1,0 +1,203 @@
+---
+title: "Analysis for phases and fold-chamge over time, after rhythmicity"
+output: html_notebook
+---
+
+
+
+```{r}
+#clear your workspace
+rm(list=ls())
+
+#Load useful packages
+
+if (!require("tidyverse")) {
+  install.packages("tidyverse", dependencies = TRUE)
+  library(tidyverse)
+}
+
+
+if (!require("ggplot2")) {
+  install.packages("ggplot2", dependencies = TRUE)
+  library(ggplot2)
+}
+
+if (!require("gridExtra")) {
+  install.packages("gridExtra", dependencies = TRUE)
+  library(gridExtra)
+}
+
+
+
+#make a list of all the .csv files in your working directory just so you can see what's going on
+X = list.files(".",".csv")
+X
+
+#load in the rhythmicity analysis (RAIN + ECHO) results
+
+#syn
+syn_R <- read.csv("w proteins filtered syn RAIN.csv", stringsAsFactors = F)
+
+#total
+total_R <- read.csv("w proteins filtered total RAIN.csv", stringsAsFactors = F)
+
+#synprop_R <- read.csv("w proteins filtered H-prop RAIN.csv", stringsAsFactors = F)
+
+
+
+```
+
+```{r}
+
+#rhythmic based on RAIN
+syn_rhy <- syn_R %>% filter(pVal<0.05)
+total_rhy <- total_R %>% filter(pVal<0.05)
+
+syntot_R <- merge(syn_R, total_R, by="Leading.razor.protein", suffixes=c(".syn", ".tot"))
+
+write.csv(syntot_R, "w proteins synthesis and total RAIN.csv", row.names = F)
+
+#divide into 4 sets based on "rhythmicity""
+
+rhy_both <- syntot_R %>% filter(pVal.syn<0.05 & pVal.tot<0.05) #36
+rhy_totonly <- syntot_R %>% filter(pVal.syn>0.05 & pVal.tot<0.05) #121
+rhy_synonly <- syntot_R %>% filter(pVal.syn<0.05 & pVal.tot>0.05) #114
+nonrhy <- syntot_R %>% filter(pVal.syn>0.05 & pVal.tot>0.05) #2257
+
+
+```
+
+```{r}
+#check numbers for anova
+syn_R_avFC <- read.csv("w proteins syn RAIN avFC ANOVA.csv", stringsAsFactors = F)
+tot_R_avFC <- read.csv("w proteins total RAIN avFC ANOVA.csv", stringsAsFactors = F)
+
+syntot_R_avFC <- merge(syn_R_avFC, tot_R_avFC, by="Leading.razor.protein", suffixes=c(".syn", ".tot"))
+
+syntot_R_avFC %>% filter(anova_pval.syn<0.05 & anova_pval.tot<0.05) #16
+syntot_R_avFC %>% filter(anova_pval.syn>0.05 & anova_pval.tot<0.05) #67
+syntot_R_avFC %>% filter(anova_pval.syn<0.05 & anova_pval.tot>0.05) #50
+syntot_R_avFC %>% filter(anova_pval.syn>0.05 & anova_pval.tot>0.05) #2395
+
+
+
+```
+
+
+
+```{r}
+#compare phase plots of these 
+
+#function
+#function ot plot
+axis_colour = "grey85"
+axis_text_size = 10
+
+plottheme <- theme(axis.text.x = element_text(color = "black", size = axis_text_size, vjust = 0),
+        axis.title.y = element_blank(), 
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        panel.border = element_blank(),
+        plot.background = element_rect(fill="transparent"),
+        panel.background = element_rect(fill = "transparent"),
+        legend.box.background = element_blank(),
+        legend.text = element_text(size = axis_text_size)
+        )
+
+phasepl <- function(data, ph, maxh, t) {
+  ggplot(data, aes(x = ph)) + 
+  geom_hline(yintercept = seq(0, maxh, by = maxh/5), colour = axis_colour, size = 0.2) +
+  geom_vline(xintercept = seq(6, 24, 6), colour = axis_colour, size = 0.2) +
+  geom_histogram(binwidth=6, aes(fill = ..count..)) +
+  scale_x_continuous(name = t,
+                     breaks = seq(6, 24, 6),
+                     position = "top") +
+  scale_fill_gradient("Count", low="blue", high="red", limits=c(1,70)) +
+plottheme +
+  coord_polar(theta = "x", start = (-45*pi)/180, direction = 1) # changing the angle rotations - must be in radians, or just add to the formula
+}
+
+
+
+p1 <- phasepl(rhy_synonly, rhy_synonly$phase.syn, 50, "rhythmic in synthesis only")
+p2 <- phasepl(rhy_totonly, rhy_totonly$phase.syn, 50, "rhythmic in total only")
+
+pl <- grid.arrange(p1, p2)
+#ggsave(plot=pl, "phases radial plots.pdf", height=6, width=3)
+
+
+p3 <- phasepl(rhy_both, rhy_both$phase.syn, 50, "rhythmic in both,\n synthesis phase")
+p4 <- phasepl(rhy_both, rhy_both$phase.tot, 50, "rhythmic in both,\n total phase")
+
+pl <- grid.arrange(p1, p2, p3, p4, nrow=2)
+#ggsave(plot=pl, "phases radial plots.pdf", height=6, width=6)
+
+
+p_syn <- phasepl(syn_rhy, syn_rhy$phase, 70, "rhythmic in synthesis")
+p_tot <- phasepl(total_rhy, total_rhy$phase, 70, "rhythmic in total")
+
+pl <- grid.arrange(p_syn, p_tot, nrow=1)
+ggsave(plot=pl, "phases radial plots 2.pdf", height=3, width=6)
+
+
+```
+
+```{r}
+
+
+
+#calculate phase difference
+rhy_both$phase_diff <- rhy_both$phase.syn - rhy_both$phase.tot
+rhy_both <- rhy_both %>% mutate(phase_diff, circad_diff = case_when(phase_diff==-18 ~ 6, phase_diff == -12 ~ 12, phase_diff == 18 ~ -6, TRUE ~ as.numeric(phase_diff)))
+
+#chnage plottheme
+plottheme <- theme(
+  # Remove panel border
+  panel.border = element_blank(),  
+  # Remove panel grid lines
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  # Remove panel background
+  panel.background = element_blank(),
+  # Add axis line
+  axis.line = element_line(colour = "black"),
+  axis.text=element_text(colour="black", size=11),
+  axis.title=element_text(size=14),
+  )
+
+pdif_st <- ggplot()+geom_histogram(aes(x=as.factor(rhy_both$circad_diff)),  stat="count") + plottheme + labs(x="Phase difference\n synthesis-total")
+pdif_st
+
+ggsave(plot=pdif_st, "phase differences rhythmic.pdf", width=3, height=3)
+
+
+```
+
+```{r}
+#compare fold-changes
+
+
+syn_rhy_FC <- syn_R_avFC %>% filter(pVal<0.05)
+total_rhy_FC <- tot_R_avFC %>% filter(pVal<0.05)
+
+colours <- c("syn rhy"="skyblue3", "total rhy"="orange")
+wilcox.test(syn_rhy_FC$FCav, total_rhy_FC$FCav)
+pval <- wilcox.test(syn_rhy_FC$FCav, total_rhy_FC$FCav)$p.value
+fcpb_rhy <- ggplot() + 
+    geom_density(aes(x = (syn_rhy_FC$FCav), fill = "syn rhy"),
+                color = "black", alpha = 0.5) +
+    geom_density(aes(x = (total_rhy_FC$FCav), fill = "total rhy"),
+               color = "black", alpha = 0.5) +
+  scale_fill_manual(name = "", values = colours) +
+  scale_x_continuous(trans="log") + 
+  labs(y = "Probability density", title='rhythmic only', x="Fold-change", subtitle=paste("pval=", pval, "; median FC syn", round(median(syn_rhy_FC$FCav), 3), "; median FC total", round(median(total_rhy_FC$FCav), 3))) + plottheme + xlim(1, 2.5)
+
+fcpb_rhy
+
+ggsave(plot=fcpb_rhy, "fold-change probability density rhy.pdf", height=4, width=6)
+
+
+```
+
+

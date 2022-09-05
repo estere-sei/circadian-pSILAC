@@ -1,0 +1,320 @@
+---
+title: "SILAC-TMT peptide normalisation and grouping into peptides"
+subtitle: ""
+output: html_notebook
+---
+
+
+```{r}
+#setup
+
+#clear your workspace
+rm(list=ls())
+
+#Load useful packages
+
+if (!require("tidyverse")) {
+  install.packages("tidyverse", dependencies = TRUE)
+  library(tidyverse)
+}
+
+
+if (!require("tools")) {
+  install.packages("tools", dependencies = TRUE)
+  library(tools)
+}
+
+if (!require("ggplot2")) {
+  install.packages("ggplot2", dependencies = TRUE)
+  library(ggplot2)
+}
+
+if (!require("reshape2")) {
+  install("reshape2")
+  library(reshape2)
+} 
+
+#just for plotDensities function
+if (!require("edgeR")) {
+  BiocManager::install("edgeR")
+  library(edgeR)
+} 
+
+
+#load in the evidence file - raw peptide-level data
+ev <- read.delim("CRM5499_siTMT_Faims_MS3_M_rev_evidence.txt", stringsAsFactors=F)
+
+#check columns and types of modifications
+colnames(ev)
+unique(ev$Modifications)
+
+```
+
+```{r}
+#clean up & rearrange the data
+
+#take only seq info, protein info, and reporter ion intensity + MQ id numbers  to cross-reference if needed later
+pept_d <- ev[,c(1:4,18,19:20, 57:72, 110:115)] 
+colnames(pept_d)
+
+#rename & re-arrange columns according to the list Sew provided - xls file with TMT labels matched to samples
+colnames(pept_d)[8:23] <- c("S8", "C1", "S6", "C3", "S2", "C5", "S4", "C4", "S7", "C6", "S5", "C7", "S3", "C2", "S1", "C8")
+colnames(pept_d)
+pept_d <- dplyr::select(pept_d, c(1:7, "C1", "S1", "C2", "S2", "C3", "S3", "C4", "S4", "C5", "S5", "C6", "S6", "C7", "S7", "C8", "S8", 24:29))
+
+head(pept_d, 10)
+colnames(pept_d)
+
+
+#check and remove contaminants - should be all marked as CON__ in the MQ evidence
+pept_d[which(grepl("CON__", pept_d$Leading.razor.protein, fixed=TRUE)),] #754
+pept_d <- pept_d[-which(grepl("CON__", pept_d$Leading.razor.protein, fixed=TRUE)),]
+
+#same for REV__ proteins - reverse hits
+pept_d[which(grepl("REV__", pept_d$Leading.razor.protein, fixed=TRUE)),] #211
+pept_d <- pept_d[-which(grepl("REV__", pept_d$Leading.razor.protein, fixed=TRUE)),]
+
+
+#remove rows where all 16 channels are 0
+pept_0allr <- pept_d[which(rowSums(pept_d[8:23])>0),]
+head(pept_0allr, 100)
+nrow(pept_0allr)/nrow(pept_d) #80%
+#65 566 peptides
+
+```
+
+
+```{r}
+#sum identical peptides (with exactly the same modifications)
+
+pept_sum <- pept_0allr %>% 
+  group_by(Modified.sequence) %>%
+  dplyr::summarise(across(C1:S8, sum))
+
+
+#take info about pepetides (which genes, proteins, ms groups, etc), leave only 1 for each distinct sequence 
+colnames(pept_0allr)
+data_info <- pept_0allr[c(1:7, 24:29)]
+pept_info <- dplyr::distinct(data_info, Modified.sequence, .keep_all=T)
+
+          
+pept_unique <- merge(pept_sum, pept_info, by="Modified.sequence")
+pept_unique
+
+
+#double-check the numbers
+length(unique(pept_0allr$Modified.sequence))
+nrow(pept_unique) #yep, both 46919 unique peptides
+
+
+#create separate column to easily distingiush heavy & light peptides
+pept_unique$Label <- apply(pept_unique, 1, function (x) { if (grepl("Lys8", x["Modifications"], fixed=TRUE)|grepl("Arg10", x["Modifications"])) {
+    x["Label"] <- "H"    } else {
+      x["Label"] <- "L" }
+})
+
+
+
+#check how many H & L
+table(pept_unique$Label)#7410H 39509L
+
+#save!
+write.csv(pept_unique, "w peptides cleaned MS3-FAIMS-rev.csv", row.names = F)
+
+
+```
+
+
+
+
+
+```{r}
+
+#load in the normalised peptides if need to start from here 
+#pept_unique <- read.csv("M cells peptides cleaned MS3-FAIMS-rev.csv", stringsAsFactors=F)
+head(pept_unique)
+
+colnames(pept_unique)
+
+#remove C columns - not relevant here; S1-S8 =  8 timepoints
+pept_unique <- pept_unique %>% dplyr::select(!starts_with("C"))
+colnames(pept_unique)
+
+```
+```{r}
+
+#actually hasn't finished clearup because still have extra modifications like Met oxidation
+
+#want just 2 peptides (light and heavy), currently some have more than two because of those other modifications
+pept_unique %>% group_by(Sequence) %>% dplyr::count() %>% filter(n>2)
+
+pept_2 <- pept_unique %>% 
+  group_by(Sequence, Label, Leading.razor.protein, Gene.names, Protein.names) %>% dplyr::select(2:9) %>% summarise_all(sum)
+
+pept_2 %>% group_by(Sequence) %>% dplyr::count() #ok, now all 1 or 2
+
+nrow(pept_2)/nrow(pept_unique) #95% from previous step, so fine
+
+#want to keep only those that are detected in all timepoints, so convert all 0 to NA and omit
+no0 <- pept_2
+no0[no0==0] <- NA
+no0 <- na.omit(no0)
+
+table(no0$Label)
+no0
+
+```
+
+
+
+```{r}
+
+#see medians and distributions
+boxplot(log2(no0[6:13]), 
+        main = "peptides raw",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+
+plotDensities(log2(no0[6:13]), main = "peptides raw",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+
+
+#also try PCA
+plotMDS(log2(no0[6:13]), col = rep(c("red", "green"), each = 2), 
+        main = "raw")
+
+
+#check how many H & L
+table(no0$Label) #after filtering have 7031 H and 34900 L peptides
+
+pept_filter0 <- no0
+
+```
+
+
+```{r}
+#first see all proteins, without worrying about H & L labels
+
+#group by uniprot_ID
+colnames(pept_filter0)
+prot <- pept_filter0 %>% 
+  group_by(Leading.razor.protein) %>% dplyr::select(6:13) %>% summarise_all(sum)
+
+
+#then add back the gene name & protein name
+data_info <- pept_filter0[c(3:5)]
+prot_info <- dplyr::distinct(data_info, Leading.razor.protein, .keep_all=T)
+
+all_prot <- merge(prot_info, prot, by="Leading.razor.protein") %>% distinct(Leading.razor.protein, .keep_all = T)
+
+
+boxplot(log2(all_prot[4:11]), col = rep(c("red", "green"), 2), 
+        main = "proteins no norm",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+#doesn't plot 0 anyway because can't take log2 of 0
+
+plotDensities(log2(all_prot[4:11]), main = "proteins no norm",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+
+
+#sample loading (SL) normalistion here, like in other protein TMT exps
+
+all_prot_SL <- all_prot
+sums <- all_prot[4:11] %>% colSums()
+scf <- sums/median(sums) #scaling factor
+all_prot_SL[4:11] <- sweep(all_prot[4:11], 2, scf, FUN = "/")
+
+boxplot(log2(all_prot_SL[4:11]), col = rep(c("red", "green"), 2), 
+        main = "proteins SL norm",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+
+plotDensities(log2(all_prot_SL[4:11]), main = "proteins SL norm",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+
+
+#save!
+write.csv(all_prot_SL, "w proteins ALL SL normalised.csv", row.names = F)
+
+```
+
+
+
+
+```{r}
+#leave only peptides present in both L & H
+
+pept_LH_list <- merge(pept_filter0 %>% filter(Label=="L"), pept_filter0 %>% filter(Label=="H"), by="Sequence")$Sequence
+pept_LH <- pept_filter0 %>% filter(Sequence %in% pept_LH_list)
+
+#group by uniprot_ID & label (so distinguishing H & L)
+colnames(pept_LH)
+prot <- pept_LH %>% 
+  group_by(Leading.razor.protein, Label) %>% dplyr::select(6:13) %>% summarise_all(sum)
+
+
+
+#then add back the gene name & protein name
+data_info <- pept_LH[c(3:5)]
+prot_info <- dplyr::distinct(data_info, Leading.razor.protein, .keep_all=T)
+
+all_prot <- merge(prot_info, prot, by="Leading.razor.protein") %>% distinct(Leading.razor.protein, Label, .keep_all = T)
+
+#visualise to double-check
+boxplot(log2(all_prot[5:12]), col = rep(c("red", "green"), 2), 
+        main = "proteins no norm",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+
+plotDensities(log2(all_prot[5:12]), col = rep(c("red", "green"), 2), main = "proteins no norm",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+
+
+```
+
+
+
+
+```{r}
+#sample loading (SL) normalistion here
+
+all_prot_SL <- all_prot
+sums <- all_prot[5:12] %>% colSums()
+scf <- sums/median(sums) #scaling factor
+all_prot_SL[5:12] <- sweep(all_prot[5:12], 2, scf, FUN = "/")
+
+boxplot(log2(all_prot_SL[5:12]), col = rep(c("red", "green"), 2), 
+        main = "proteins SL norm",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+
+plotDensities(log2(all_prot_SL[5:12]), main = "proteins SL norm",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+
+
+#save!
+write.csv(all_prot_SL, "w proteins HL SL normalised.csv", row.names = F)
+```
+
+
+```{r}
+#now merge light & heavy & all, so have protein by protein
+light <- all_prot_SL %>% filter(Label=="L")
+heavy <- all_prot_SL %>% filter(Label=="H")
+colnames(heavy)
+
+together <- merge(light, heavy[c(1, 5:12)], by="Leading.razor.protein", suffixes=c("L", "H"))
+
+colnames(together)
+together[21:28] <- together[5:12]+together[13:20]
+together[2, 5:12]+together[2, 13:20]
+together[2, 21:28]
+
+colnames(together)[21:28] <- paste0(colnames(all_prot)[5:12], "T") #total = L+H
+colnames(together)
+together[29:36] <- together[13:20]/together[21:28]
+colnames(together)[29:36] <- paste0(colnames(all_prot)[5:12], ".Hprop") #proportion heavy
+colnames(together)
+
+write.csv(together, "w proteins HL together SL normalised.csv", row.names = F)
+```
+
+
+
+
