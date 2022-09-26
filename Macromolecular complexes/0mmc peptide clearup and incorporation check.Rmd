@@ -1,0 +1,177 @@
+---
+title: "SILAC peptide quantification"
+subtitle: "Clearing data and checking incorporation; normalise in another script;  _corr - meaning corrected for TMT impurities"
+output: html_notebook
+---
+
+
+```{r}
+#setup
+
+#clear your workspace
+rm(list=ls())
+
+#Load useful packages
+
+if (!require("tidyverse")) {
+  install.packages("tidyverse", dependencies = TRUE)
+  library(tidyverse)
+}
+
+if (!require("tools")) {
+  install.packages("tools", dependencies = TRUE)
+  library(tools)
+}
+
+if (!require("ggplot2")) {
+  install.packages("ggplot2", dependencies = TRUE)
+  library(ggplot2)
+}
+
+if (!require("reshape2")) {
+  install("reshape2")
+  library(reshape2)
+} 
+
+
+#make a list of all the .csv files in your working directory just so you can see what's going on
+X = list.files(".",".csv")
+X
+
+#load in the evidence file
+#new corrected one from Sew - TMT lables impurities/contaminations are corrected for - see email thread
+ev <- read.delim("CRM6030_siTMT18_evid_corr.txt", stringsAsFactors=F)
+
+colnames(ev)
+
+#unique(ev$Modifications)
+
+```
+
+```{r}
+#clean up & rearrange the data
+
+#take only seq info, protein info, and reporter ion intensity!
+pept_d <- ev[,c(1:4,18,19:20, 57:74)] 
+colnames(pept_d)
+
+#rename & re-arrange columns according to the xls file with TMT labels 
+#also change labelling 
+colnames(pept_d)[8:25] <- c("H.L.ctrl", "t1.1", "t2.1", "t1.2", "t2.2", "t5.1", "t8.1", "t5.2", "t8.2", "t7.1", "t3.1", "t7.2", "t3.2", "t4.1", "t6.1", "t4.2", "t6.2", "H.boost")
+colnames(pept_d)
+pept_d <- dplyr::select(pept_d, c(1:7, "t1.1", "t1.2", "t2.1", "t2.2", "t3.1", "t3.2", "t4.1", "t4.2", "t5.1", "t5.2", "t6.1", "t6.2", "t7.1", "t7.2", "t8.1", "t8.2", "H.L.ctrl", "H.boost"))
+
+head(pept_d, 10)
+colnames(pept_d)
+
+
+#check and remove contaminants - should be all marked as CON__ in the MQ evidence
+pept_d[which(grepl("CON__", pept_d$Leading.razor.protein, fixed=TRUE)),] #1581
+pept_d <- pept_d[-which(grepl("CON__", pept_d$Leading.razor.protein, fixed=TRUE)),]
+
+#same for REV__ proteins - reverse hits? or also contaminants?
+pept_d[which(grepl("REV__", pept_d$Leading.razor.protein, fixed=TRUE)),] #279
+pept_d <- pept_d[-which(grepl("REV__", pept_d$Leading.razor.protein, fixed=TRUE)),]
+
+
+#remove rows where all 16 channels are 0
+pept_0allr <- pept_d[which(rowSums(pept_d[8:25])>0),]
+head(pept_0allr, 100)
+nrow(pept_0allr)/nrow(pept_d) #85% remaining
+#96514 peptides (in non-corr - 112467 peptides was there)
+
+#CHECK how many 0 are in some timepoints but not the others
+plyr::ldply(pept_0allr[8:25], function(c) sum(c==0))
+#as expected, pretty simiialr in all samples except H booster
+```
+
+
+```{r}
+#sum identical peptides (with exactly the same modifications)
+
+colnames(pept_0allr)
+
+pept_sum <- pept_0allr %>% 
+  group_by(Modified.sequence) %>% dplyr::select(8:25) %>% summarise_all(sum)
+
+
+nrow(pept_sum)/nrow(ev) #left 62.7% of original data, 71 748 peptides
+nrow(pept_sum)/nrow(pept_0allr) #74% from previous step
+
+pept_sum
+
+#take info about pepetides (which genes, proteins, ms groups, etc), leave only 1 for each distinct sequence 
+colnames(pept_0allr)
+data_info <- pept_0allr[c(1:7)]
+pept_info <- dplyr::distinct(data_info, Modified.sequence, .keep_all=T)
+
+          
+pept_unique <- merge(pept_sum, pept_info, by="Modified.sequence")
+pept_unique
+
+#double-check the numbers
+length(unique(pept_0allr$Modified.sequence))
+nrow(pept_unique) #yep, both 71748 unique peptides - same as non-corr!
+
+
+#create separate column to easily distingiush heavy & light peptides
+pept_unique$Label <- apply(pept_unique, 1, function (x) { if (grepl("Lys8", x["Modifications"], fixed=TRUE)|grepl("Arg10", x["Modifications"])) {
+    x["Label"] <- "H"    } else {
+      x["Label"] <- "L" }
+})
+
+
+
+#check how many H & L
+table(pept_unique$Label)#11055H 60693L
+
+#save!
+write.csv(pept_unique, "mmc peptides cleaned.csv", row.names = F)
+
+
+```
+
+
+
+```{r}
+#check incorporation and ion interference
+
+#create separate dataframes
+light <- pept_unique[which(pept_unique$Label=="L"),]
+heavy <- pept_unique[which(pept_unique$Label=="H"),]
+
+
+#calculate and plot fraction of heavy & light overall for each sample
+hl_total <- tibble(light = colSums(light[2:19]), heavy = colSums(heavy[2:19]))
+hl_total$sample <- colnames(light)[2:19]
+hl_total
+
+
+hl_total_m <- melt(hl_total, c("sample"))
+hl_total_m 
+
+ggplot(hl_total_m, aes(fill=variable, y=value, x=sample)) + 
+    geom_bar(position="stack", stat="identity")
+
+#percentage
+ggplot(hl_total_m, aes(fill=variable, x=value, y=sample)) + 
+    geom_bar(position="fill", stat="identity") + theme(axis.text = element_text(size = 12))
+
+#ggsave("proportion incorporation check CORR.png", width=6, height=4)
+
+#save the total intensities & percentages incorporation separately
+hl_total$total <- hl_total$light + hl_total$heavy
+hl_total$heavy_pr <- hl_total$heavy/hl_total$total
+hl_total
+
+#write.csv(hl_total, "stc label incorpotation CORR.csv", row.names = F)
+
+
+```
+
+```{r}
+
+
+```
+
+

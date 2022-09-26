@@ -1,0 +1,279 @@
+---
+title: "SILAC-TMT peptide normalisation and grouping into proteins"
+subtitle: "more clearing up, leaving peptides present in both H and L forms, grouping, then normalising for loading (total sum intensity)"
+output: html_notebook
+---
+
+
+```{r}
+#setup
+
+#clear your workspace
+rm(list=ls())
+
+#Load useful packages
+
+if (!require("tidyverse")) {
+  install.packages("tidyverse", dependencies = TRUE)
+  library(tidyverse)
+}
+
+if (!require("ggplot2")) {
+  install.packages("ggplot2", dependencies = TRUE)
+  library(ggplot2)
+}
+
+if (!require("reshape2")) {
+  install("reshape2")
+  library(reshape2)
+} 
+
+#just for plotDensities function
+if (!require("edgeR")) {
+  BiocManager::install("edgeR")
+  library(edgeR)
+} 
+
+
+#make a list of all the .csv files in your working directory just so you can see what's going on
+X = list.files(".",".csv")
+X
+
+#load in the normalised peptides
+pept_unique <- read.csv("mmc peptides cleaned.csv", stringsAsFactors=F)
+head(pept_unique)
+
+colnames(pept_unique)
+```
+
+
+
+
+```{r}
+
+#actually hasn't finished clearup because still have extra modifications like Met oxidation
+
+#want just 2 peptides (light and heavy), currently some have more than two because of those other modifications
+pept_unique %>% group_by(Sequence) %>% dplyr::count() %>% filter(n>2)
+
+pept_2 <- pept_unique %>% 
+  group_by(Sequence, Label, Leading.razor.protein, Gene.names, Protein.names) %>% dplyr::select(2:19) %>% summarise_all(sum)
+
+pept_2 %>% group_by(Sequence) %>% dplyr::count() #ok, now all 1 or 2
+
+nrow(pept_2)/nrow(pept_unique) #95% from previous step, so fine
+
+
+
+```
+
+
+
+```{r}
+
+#convert 0 to NAs
+no0 <- pept_2
+no0[no0==0] <- NA
+
+h1 <- no0[,1:21] %>% na.omit() %>% filter(Label=="H") #6807 heavy pept without missing values
+length(unique(h1$Leading.razor.protein)) #2574
+
+
+#see medians and distributions
+
+boxplot(log2(no0[6:23]), col = rep(c("red", "green"), 2), 
+        main = "peptides raw",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+
+plotDensities(log2(no0[6:23]), main = "peptides raw",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+
+
+
+#leave only timecourse samples, remove booster & control channels + remove all rows containing 0
+pept_filter <- no0[,1:21] %>% na.omit()
+
+
+#check how many H & L
+table(pept_filter$Label) #after filtering have 6807 H and 53219 L peptides
+
+#actually bring back 0 here
+pept_filter0 <- pept_filter %>% replace(is.na(.), 0)
+
+```
+
+
+```{r}
+#first see all proteins, without worrying about H & L labels
+#try to group into proteins, to see how it looks + save 
+
+#group by uniprot_ID
+colnames(pept_filter0)
+prot <- pept_filter0 %>% 
+  group_by(Leading.razor.protein) %>% dplyr::select(6:21) %>% summarise_all(sum)
+
+
+
+#then add back the gene name & protein name
+data_info <- pept_filter0[c(3:5)]
+prot_info <- dplyr::distinct(data_info, Leading.razor.protein, .keep_all=T)
+
+all_prot <- merge(prot_info, prot, by="Leading.razor.protein") %>% distinct(Leading.razor.protein, .keep_all = T)
+
+all_prot
+colnames(all_prot)
+
+
+boxplot(log2(all_prot[4:19]), col = rep(c("red", "green"), 2), 
+        main = "proteins no norm",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+#doesn't plot 0 anyway because can't take log2 of 0
+
+plotDensities(log2(all_prot[4:19]), col = rep(c("red", "green"), 2), main = "proteins no norm",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+```
+
+```{r}
+#sample loading (SL) normalistion here, like in other protein TMT exps
+
+all_prot_SL <- all_prot
+sums <- all_prot[4:19] %>% colSums()
+scf <- sums/median(sums) #scaling factor
+all_prot_SL[4:19] <- sweep(all_prot[4:19], 2, scf, FUN = "/")
+
+boxplot(log2(all_prot_SL[4:19]), col = rep(c("red", "green"), 2), 
+        main = "proteins SL norm",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+
+plotDensities(log2(all_prot_SL[4:19]), main = "proteins SL norm",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+
+
+#save!
+write.csv(all_prot_SL, "mmc proteins ALL SL normalised.csv", row.names = F)
+
+```
+
+
+
+```{r}
+#now separate light and heavy peptides
+#leave only peptides present in both L & H
+
+pept_LH_list <- merge(pept_filter0 %>% filter(Label=="L"), pept_filter0 %>% filter(Label=="H"), by="Sequence")$Sequence
+pept_LH <- pept_filter0 %>% filter(Sequence %in% pept_LH_list)
+
+pept_LH #11 852 peptides
+
+#try to group into proteins, to see how it looks + save 
+
+#group by uniprot_ID & label (so distinguishing H & L, can sum up later if neded)
+colnames(pept_LH)
+prot <- pept_LH %>% 
+  group_by(Leading.razor.protein, Label) %>% dplyr::select(6:21) %>% summarise_all(sum)
+
+
+
+#then add back the gene name & protein name
+data_info <- pept_LH[c(3:5)]
+prot_info <- dplyr::distinct(data_info, Leading.razor.protein, .keep_all=T)
+
+all_prot <- merge(prot_info, prot, by="Leading.razor.protein") %>% distinct(Leading.razor.protein, Label, .keep_all = T)
+#all_prot <- left_join(prot_info, prot, by="Leading.razor.protein")
+
+#eg, to double-check each protein appears once as H & L, and has one gene name entry assigned - previously had problems with that
+all_prot %>% filter(Leading.razor.protein == "A2A432")
+prot_info %>% filter(Leading.razor.protein == "A2A432")
+
+
+all_prot
+colnames(all_prot)
+
+
+#visualise to double-check
+boxplot(log2(all_prot[5:20]), col = rep(c("red", "green"), 2), 
+        main = "proteins no norm",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+
+plotDensities(log2(all_prot[5:20]), col = rep(c("red", "green"), 2), main = "proteins no norm",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+
+
+```
+
+
+
+```{r}
+#check overall incorporation again
+
+colnames(pept_LH)
+heavy <- pept_LH %>% filter(Label=="H") %>% ungroup() %>% dplyr::select(c(6:21)) %>% colSums()
+light <- pept_LH %>% filter(Label=="L") %>% ungroup() %>% dplyr::select(c(6:21)) %>% colSums()
+
+#calculate and plot fraction of heavy & light overall for each sample
+hl_total <- tibble(heavy, light)
+hl_total$sample <- c("t1.1", "t1.2", "t2.1", "t2.2", "t3.1", "t3.2", "t4.1", "t4.2", "t5.1", "t5.2", "t6.1", "t6.2", "t7.1", "t7.2", "t8.1", "t8.2")
+hl_total_m <- melt(hl_total, c("sample"))
+hl_total_m 
+
+ggplot(hl_total_m, aes(fill=variable, y=value, x=sample)) + 
+    geom_bar(position="stack", stat="identity")
+
+#percentage
+ggplot(hl_total_m, aes(fill=variable, x=value, y=sample)) + 
+    geom_bar(position="fill", stat="identity") + theme(axis.text = element_text(size = 12))
+
+#save the total intensities & percentages incorporation separately
+hl_total$total <- hl_total$light + hl_total$heavy
+hl_total$heavy_pr <- hl_total$heavy/hl_total$total
+hl_total
+
+#write.csv(hl_total, "label incorpotation PEPTIDES PRESENT IN BOTH.csv", row.names = F)
+
+
+```
+
+
+
+```{r}
+#sample loading (SL) normalistion here, like in other protein TMT exps
+
+all_prot_SL <- all_prot
+sums <- all_prot[5:20] %>% colSums()
+scf <- sums/median(sums) #scaling factor
+all_prot_SL[5:20] <- sweep(all_prot[5:20], 2, scf, FUN = "/")
+
+boxplot(log2(all_prot_SL[5:20]), col = rep(c("red", "green"), 2), 
+        main = "proteins SL norm",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+
+plotDensities(log2(all_prot_SL[5:20]), main = "proteins SL norm",
+        xlab = 'TMT Sample', ylab = 'log2 of Intensity', notch = TRUE)
+
+
+#save!
+write.csv(all_prot_SL, "mmc proteins SL normalised present H and L.csv", row.names = F)
+```
+
+
+```{r}
+#now merge light & heavy & all, so have protein by protein
+light <- all_prot_SL %>% filter(Label=="L")
+heavy <- all_prot_SL %>% filter(Label=="H")
+colnames(heavy)
+
+together <- merge(light, heavy[c(1, 4:20)], by="Leading.razor.protein", suffixes=c("L", "H"))
+
+colnames(together)
+together[38:53] <- together[5:20]+together[22:37]
+together[2, 5:20]+together[2, 22:37]
+together[2, 38:53]
+
+colnames(together)[38:53] <- paste0(colnames(all_prot)[5:20], "T") #total = L+H
+colnames(together)
+together[54:69] <- together[22:37]/together[38:53]
+colnames(together)[54:69] <- paste0(colnames(all_prot)[5:20], ".Hprop") #proportion heavy
+colnames(together)
+
+write.csv(together, "mmc proteins HL together SL normalised.csv", row.names = F)
+```
