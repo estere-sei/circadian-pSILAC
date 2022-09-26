@@ -1,0 +1,151 @@
+---
+title: "SILAC-TMT timecourse - taking normalised data for rhythmicity analysis"
+output: html_notebook
+---
+
+
+```{r}
+#setup
+
+#clear your workspace
+rm(list=ls())
+
+#Load useful packages
+
+if (!require("tidyverse")) {
+  install.packages("tidyverse", dependencies = TRUE)
+  library(tidyverse)
+}
+
+
+if (!require("rain")) {
+  BiocManager::install("rain")
+  library(rain)
+}
+
+
+
+#make a list of all the .csv files in your working directory just so you can see what's going on
+X = list.files(".",".csv")
+X
+
+#load in the grouped proteins + the ratios calculated (do RAIN on that for now)
+
+all_prot <- read.csv("mmc proteins HL together SL normalised.csv", stringsAsFactors = F)
+colnames(all_prot)
+
+#all_total - i.e. summing H & L, very simple
+all_prot_all <- read.csv("mmc proteins ALL SL normalised.csv", stringsAsFactors = F)
+
+```
+
+
+
+```{r}
+#create separate data tables for synthesis, total
+
+syn <- all_prot[c(1:3, 22:37)] #synthesis - just the heavy in silac samples
+H_prop <- all_prot[c(1:3, 54:69)] #Heavy/Total = proportion of heavy, relative turnover
+total <-  all_prot[c(1:3, 38:53)]
+
+```
+
+```{r}
+#function for RAIN
+
+makeitrain <- function(df, pcutoff) {
+  RAIN_in <- t(df[4:19]) #Transpose data only columns, to create the inputs for RAIN
+  RAIN_out <- as.data.frame(matrix(0,nrow(RAIN_in), 4)) #create matrix for RAIN output
+  #RAIN parameters
+  step = 6 #number of hours between timepoints
+  period = 24 #specify period length to test for
+  rep = 2 #number of biological replicates
+  #do rain
+  RAIN_out <- rain(RAIN_in, step, period, nr.series = rep)
+  #add back gene names and other protein info
+  RAIN_out <- cbind(df[1:3], RAIN_out, df[4:19])
+  #print list & proportion of proteins "rhythmic", eg <0.05 p (but could change)
+  subset(RAIN_out, pVal<0.05)
+  print(c("percentage rhythmic with cutoff", nrow(subset(RAIN_out, pVal<pcutoff))/nrow(RAIN_out)))
+  #add relative amplitude calculation at once + baseline (average expression)
+  RAIN_out$Av_expr <- apply(RAIN_out[8:23], 1, mean)
+  RAIN_out$Amplitude <- apply(RAIN_out[8:23], 1, function(x) ((max(x)-min(x))/mean(x)))
+  print(c("amplitude of all & rhythmic", median(RAIN_out$Amplitude), median(subset(RAIN_out, pVal<pcutoff)$Amplitude)))
+  #add variance
+  RAIN_out$CV <- apply(RAIN_out[8:23], 1, function(x) sd(as.numeric(x))/mean(as.numeric(x)))
+  return(RAIN_out) }
+
+  
+
+```
+
+
+
+```{r}
+#all toals
+
+total_R <- makeitrain(total, 0.05) 
+syn_R <- makeitrain(syn, 0.05) 
+H_prop_R <- makeitrain(H_prop, 0.05) 
+alltotal_R <- makeitrain(all_prot_all, 0.05) 
+
+write.csv(total_R, "mmc proteins filtered total RAIN.csv", row.names = F)
+write.csv(syn_R, "mmc proteins filtered syn RAIN.csv", row.names = F)
+write.csv(H_prop_R, "mmc proteins filtered propHtoT RAIN.csv", row.names = F)
+write.csv(alltotal_R, "mmc proteins all non-filtered RAIN.csv", row.names = F)
+
+```
+
+
+```{r}
+#create function for calculating average fold-chnange and doing ANOVA
+
+avFC_anova <- function(df_R) {
+df_R_avFC <- df_R[1:7]
+#calculate average of two replicates for each protein
+for (i in 1:nrow(df_R_avFC)) {
+eg <- df_R[i, 8:23]
+day1av <- c(rowMeans(eg[1:2]), rowMeans(eg[3:4]), rowMeans(eg[5:6]), rowMeans(eg[7:8]))
+eg2 <- eg[9:16]
+day2av <- c(rowMeans(eg2[1:2]), rowMeans(eg2[3:4]), rowMeans(eg2[5:6]), rowMeans(eg2[7:8]))
+df_R_avFC[i, 8:15] <- c(day1av, day2av) #record the average
+#calculate fold-changes, then average those
+FC1 <- max(day1av)/min(day1av)
+FC2 <- max(day2av)/min(day2av)
+df_R_avFC[i, 16:18] <- c(FC1, FC2, mean(c(FC1, FC2)))
+#now do anova
+egdf <- gather(df_R_avFC[i, 8:15])
+egdf$time <- rep(paste0("t", seq(1, 4, 1)), 2)
+#need to log2 the values!
+egdf$valuelog2 <- log2(egdf$value)
+res.aov <- aov(valuelog2 ~ time, data = egdf)
+df_R_avFC[i,"anova_pval"] <- summary(res.aov)[[1]][1,5]
+}
+#rename columns and create more useful ones
+colnames(df_R_avFC)[8:15] <- paste0("t", seq(1, 8, 1), ".av")
+colnames(df_R_avFC)[16:18] <- c("FCday1", "FCday2", "FCav")
+
+df_R_avFC$anova_BHadjpval <- p.adjust(df_R_avFC$anova_pval, method="BH")
+print(c("anova non-adj p<0.05", nrow(subset(df_R_avFC, anova_pval<0.05))/nrow(df_R_avFC)))
+print(c("median fold-change", median(df_R_avFC$FCav)))
+return(df_R_avFC)
+}
+
+syn_R_avFC <- avFC_anova(syn_R) #7.8% sign with anova, 1.44 median fold-change
+tot_R_avFC <- avFC_anova(total_R) #9.2% sign with anova, 1.23 median fold-change
+
+write.csv(syn_R_avFC, "mmc proteins syn RAIN avFC ANOVA.csv", row.names = F)
+write.csv(tot_R_avFC, "mmc proteins total RAIN avFC ANOVA.csv", row.names = F)
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+
+

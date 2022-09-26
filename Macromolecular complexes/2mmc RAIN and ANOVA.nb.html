@@ -221,360 +221,268 @@ pre code {
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuI3NldHVwXG5cbiNjbGVhciB5b3VyIHdvcmtzcGFjZVxucm0obGlzdD1scygpKVxuXG4jTG9hZCB1c2VmdWwgcGFja2FnZXNcblxuaWYgKCFyZXF1aXJlKFxcdGlkeXZlcnNlXFwpKSB7XG4gIGluc3RhbGwucGFja2FnZXMoXFx0aWR5dmVyc2VcXCwgZGVwZW5kZW5jaWVzID0gVFJVRSlcbiAgbGlicmFyeSh0aWR5dmVyc2UpXG59XG5cblxuaWYgKCFyZXF1aXJlKFxccmFpblxcKSkge1xuICBCaW9jTWFuYWdlcjo6aW5zdGFsbChcXHJhaW5cXClcbiAgbGlicmFyeShyYWluKVxufVxuXG5cblxuI21ha2UgYSBsaXN0IG9mIGFsbCB0aGUgLmNzdiBmaWxlcyBpbiB5b3VyIHdvcmtpbmcgZGlyZWN0b3J5IGp1c3Qgc28geW91IGNhbiBzZWUgd2hhdCdzIGdvaW5nIG9uXG5YID0gbGlzdC5maWxlcyhcXC5cXCxcXC5jc3ZcXClcblhcbmBgYFxuYGBgIn0= -->
-<pre class="r"><code>```r
-#setup
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI3NldHVwXG5cbiNjbGVhciB5b3VyIHdvcmtzcGFjZVxucm0obGlzdD1scygpKVxuXG4jTG9hZCB1c2VmdWwgcGFja2FnZXNcblxuaWYgKCFyZXF1aXJlKFwidGlkeXZlcnNlXCIpKSB7XG4gIGluc3RhbGwucGFja2FnZXMoXCJ0aWR5dmVyc2VcIiwgZGVwZW5kZW5jaWVzID0gVFJVRSlcbiAgbGlicmFyeSh0aWR5dmVyc2UpXG59XG5cblxuaWYgKCFyZXF1aXJlKFwicmFpblwiKSkge1xuICBCaW9jTWFuYWdlcjo6aW5zdGFsbChcInJhaW5cIilcbiAgbGlicmFyeShyYWluKVxufVxuYGBgIn0= -->
+<pre class="r"><code>#setup
 
 #clear your workspace
 rm(list=ls())
 
 #Load useful packages
 
-if (!require(\tidyverse\)) {
-  install.packages(\tidyverse\, dependencies = TRUE)
+if (!require(&quot;tidyverse&quot;)) {
+  install.packages(&quot;tidyverse&quot;, dependencies = TRUE)
   library(tidyverse)
 }
 
 
-if (!require(\rain\)) {
-  BiocManager::install(\rain\)
+if (!require(&quot;rain&quot;)) {
+  BiocManager::install(&quot;rain&quot;)
   library(rain)
-}
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiByYWluXG5Mb2FkaW5nIHJlcXVpcmVkIHBhY2thZ2U6IGdtcFxuXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYZ21w4oCZXG5cblRoZSBmb2xsb3dpbmcgb2JqZWN0cyBhcmUgbWFza2VkIGZyb20g4oCYcGFja2FnZTpiYXNl4oCZOlxuXG4gICAgJSolLCBhcHBseSwgY3Jvc3Nwcm9kLCBtYXRyaXgsIHRjcm9zc3Byb2RcblxuTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiBtdWx0dGVzdFxuTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiBCaW9jR2VuZXJpY3NcblxuQXR0YWNoaW5nIHBhY2thZ2U6IOKAmEJpb2NHZW5lcmljc+KAmVxuXG5UaGUgZm9sbG93aW5nIG9iamVjdHMgYXJlIG1hc2tlZCBmcm9tIOKAmHBhY2thZ2U6Z21w4oCZOlxuXG4gICAgd2hpY2gubWF4LCB3aGljaC5taW5cblxuVGhlIGZvbGxvd2luZyBvYmplY3QgaXMgbWFza2VkIGZyb20g4oCYcGFja2FnZTpsaW1tYeKAmTpcblxuICAgIHBsb3RNQVxuXG5UaGUgZm9sbG93aW5nIG9iamVjdHMgYXJlIG1hc2tlZCBmcm9tIOKAmHBhY2thZ2U6Y2lyY3VsYXLigJk6XG5cbiAgICBzZCwgdmFyXG5cblRoZSBmb2xsb3dpbmcgb2JqZWN0IGlzIG1hc2tlZCBmcm9tIOKAmHBhY2thZ2U6Z3JpZEV4dHJh4oCZOlxuXG4gICAgY29tYmluZVxuXG5UaGUgZm9sbG93aW5nIG9iamVjdHMgYXJlIG1hc2tlZCBmcm9tIOKAmHBhY2thZ2U6ZHBseXLigJk6XG5cbiAgICBjb21iaW5lLCBpbnRlcnNlY3QsIHNldGRpZmYsIHVuaW9uXG5cblRoZSBmb2xsb3dpbmcgb2JqZWN0cyBhcmUgbWFza2VkIGZyb20g4oCYcGFja2FnZTpzdGF0c+KAmTpcblxuICAgIElRUiwgbWFkLCBzZCwgdmFyLCB4dGFic1xuXG5UaGUgZm9sbG93aW5nIG9iamVjdHMgYXJlIG1hc2tlZCBmcm9tIOKAmHBhY2thZ2U6YmFzZeKAmTpcblxuICAgIGFueUR1cGxpY2F0ZWQsIGFwcGVuZCwgYXMuZGF0YS5mcmFtZSwgYmFzZW5hbWUsIGNiaW5kLCBjb2xuYW1lcywgZGlybmFtZSwgZG8uY2FsbCxcbiAgICBkdXBsaWNhdGVkLCBldmFsLCBldmFscSwgRmlsdGVyLCBGaW5kLCBnZXQsIGdyZXAsIGdyZXBsLCBpbnRlcnNlY3QsIGlzLnVuc29ydGVkLFxuICAgIGxhcHBseSwgTWFwLCBtYXBwbHksIG1hdGNoLCBtZ2V0LCBvcmRlciwgcGFzdGUsIHBtYXgsIHBtYXguaW50LCBwbWluLCBwbWluLmludCxcbiAgICBQb3NpdGlvbiwgcmFuaywgcmJpbmQsIFJlZHVjZSwgcm93bmFtZXMsIHNhcHBseSwgc2V0ZGlmZiwgc29ydCwgdGFibGUsIHRhcHBseSwgdW5pb24sXG4gICAgdW5pcXVlLCB1bnNwbGl0LCB3aGljaC5tYXgsIHdoaWNoLm1pblxuXG5Mb2FkaW5nIHJlcXVpcmVkIHBhY2thZ2U6IEJpb2Jhc2VcbldlbGNvbWUgdG8gQmlvY29uZHVjdG9yXG5cbiAgICBWaWduZXR0ZXMgY29udGFpbiBpbnRyb2R1Y3RvcnkgbWF0ZXJpYWw7IHZpZXcgd2l0aCAnYnJvd3NlVmlnbmV0dGVzKCknLiBUbyBjaXRlXG4gICAgQmlvY29uZHVjdG9yLCBzZWUgJ2NpdGF0aW9uKFwiQmlvYmFzZVwiKScsIGFuZCBmb3IgcGFja2FnZXMgJ2NpdGF0aW9uKFwicGtnbmFtZVwiKScuXG4ifQ== -->
+<pre><code>Loading required package: rain
+Loading required package: gmp
 
+Attaching package: ‘gmp’
 
+The following objects are masked from ‘package:base’:
 
-#make a list of all the .csv files in your working directory just so you can see what&#39;s going on
-X = list.files(\.\,\.csv\)
+    %*%, apply, crossprod, matrix, tcrossprod
+
+Loading required package: multtest
+Loading required package: BiocGenerics
+
+Attaching package: ‘BiocGenerics’
+
+The following objects are masked from ‘package:gmp’:
+
+    which.max, which.min
+
+The following object is masked from ‘package:limma’:
+
+    plotMA
+
+The following objects are masked from ‘package:circular’:
+
+    sd, var
+
+The following object is masked from ‘package:gridExtra’:
+
+    combine
+
+The following objects are masked from ‘package:dplyr’:
+
+    combine, intersect, setdiff, union
+
+The following objects are masked from ‘package:stats’:
+
+    IQR, mad, sd, var, xtabs
+
+The following objects are masked from ‘package:base’:
+
+    anyDuplicated, append, as.data.frame, basename, cbind, colnames, dirname, do.call,
+    duplicated, eval, evalq, Filter, Find, get, grep, grepl, intersect, is.unsorted,
+    lapply, Map, mapply, match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,
+    Position, rank, rbind, Reduce, rownames, sapply, setdiff, sort, table, tapply, union,
+    unique, unsplit, which.max, which.min
+
+Loading required package: Biobase
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with &#39;browseVignettes()&#39;. To cite
+    Bioconductor, see &#39;citation(&quot;Biobase&quot;)&#39;, and for packages &#39;citation(&quot;pkgname&quot;)&#39;.</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI21ha2UgYSBsaXN0IG9mIGFsbCB0aGUgLmNzdiBmaWxlcyBpbiB5b3VyIHdvcmtpbmcgZGlyZWN0b3J5IGp1c3Qgc28geW91IGNhbiBzZWUgd2hhdCdzIGdvaW5nIG9uXG5YID0gbGlzdC5maWxlcyhcIi5cIixcIi5jc3ZcIilcblhcbmBgYCJ9 -->
+<pre class="r"><code>#make a list of all the .csv files in your working directory just so you can see what&#39;s going on
+X = list.files(&quot;.&quot;,&quot;.csv&quot;)
 X</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwibW1jIHBlcHRpZGVzIGNsZWFuZWQuY3N2XCIgICAgICAgICAgICAgICAgICAgICAgIFwibW1jIHByb3RlaW5zIEFMTCBTTCBub3JtYWxpc2VkLmNzdlwiICAgICAgICAgICAgXG5bM10gXCJtbWMgcHJvdGVpbnMgSEwgdG9nZXRoZXIgU0wgbm9ybWFsaXNlZC5jc3ZcIiAgICAgXCJtbWMgcHJvdGVpbnMgU0wgbm9ybWFsaXNlZCBwcmVzZW50IEggYW5kIEwuY3N2XCJcbiJ9 -->
+<pre><code>[1] &quot;mmc peptides cleaned.csv&quot;                       &quot;mmc proteins ALL SL normalised.csv&quot;            
+[3] &quot;mmc proteins HL together SL normalised.csv&quot;     &quot;mmc proteins SL normalised present H and L.csv&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2xvYWQgaW4gdGhlIGdyb3VwZWQgcHJvdGVpbnMgKyB0aGUgcmF0aW9zIGNhbGN1bGF0ZWQgKGRvIFJBSU4gb24gdGhhdCBmb3Igbm93KVxuXG5hbGxfcHJvdCA8LSByZWFkLmNzdihcIm1tYyBwcm90ZWlucyBITCB0b2dldGhlciBTTCBub3JtYWxpc2VkLmNzdlwiLCBzdHJpbmdzQXNGYWN0b3JzID0gRilcbmNvbG5hbWVzKGFsbF9wcm90KVxuYGBgIn0= -->
+<pre class="r"><code>#load in the grouped proteins + the ratios calculated (do RAIN on that for now)
 
-&lt;!-- rnb-output-begin eyJkYXRhIjoiWzFdIFxcdyBwZXB0aWRlcyBjbGVhbmVkIE1TMy1GQUlNUy1yZXYuY3N2XFwgICAgIFxcdyBwcm90ZWlucyBBTEwgU0wgbm9ybWFsaXNlZC5jc3ZcXCAgICAgICAgIFxcdyBwcm90ZWlucyBITCB0b2dldGhlciBTTCBub3JtYWxpc2VkLmNzdlxcXG4ifQ== --&gt;
-</code></pre>
-<p>[1] peptides cleaned MS3-FAIMS-rev.csv  proteins ALL SL normalised.csv  proteins HL together SL normalised.csv<br />
-</p>
-<pre><code>
-
-
-&lt;!-- rnb-output-end --&gt;
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuI2xvYWQgaW4gdGhlIGdyb3VwZWQgcHJvdGVpbnMgKyB0aGUgcmF0aW9zIGNhbGN1bGF0ZWQgKGRvIFJBSU4gb24gdGhhdCBmb3Igbm93KVxuXG5hbGxfcHJvdCA8LSByZWFkLmNzdihcXHcgcHJvdGVpbnMgSEwgdG9nZXRoZXIgU0wgbm9ybWFsaXNlZC5jc3ZcXCwgc3RyaW5nc0FzRmFjdG9ycyA9IEYpXG5jb2xuYW1lcyhhbGxfcHJvdClcbmBgYFxuYGBgIn0= --&gt;
-
-```r
-```r
-#load in the grouped proteins + the ratios calculated (do RAIN on that for now)
-
-all_prot &lt;- read.csv(\w proteins HL together SL normalised.csv\, stringsAsFactors = F)
+all_prot &lt;- read.csv(&quot;mmc proteins HL together SL normalised.csv&quot;, stringsAsFactors = F)
 colnames(all_prot)</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-output-begin eyJkYXRhIjoiIFsxXSBcXExlYWRpbmcucmF6b3IucHJvdGVpblxcIFxcR2VuZS5uYW1lc1xcICAgICAgICAgICAgXFxQcm90ZWluLm5hbWVzXFwgICAgICAgICBcXExhYmVsXFwgICAgICAgICAgICAgICAgIFxcUzFMXFwgICAgICAgICAgICAgICAgICBcbiBbNl0gXFxTMkxcXCAgICAgICAgICAgICAgICAgICBcXFMzTFxcICAgICAgICAgICAgICAgICAgIFxcUzRMXFwgICAgICAgICAgICAgICAgICAgXFxTNUxcXCAgICAgICAgICAgICAgICAgICBcXFM2TFxcICAgICAgICAgICAgICAgICAgXG5bMTFdIFxcUzdMXFwgICAgICAgICAgICAgICAgICAgXFxTOExcXCAgICAgICAgICAgICAgICAgICBcXFMxSFxcICAgICAgICAgICAgICAgICAgIFxcUzJIXFwgICAgICAgICAgICAgICAgICAgXFxTM0hcXCAgICAgICAgICAgICAgICAgIFxuWzE2XSBcXFM0SFxcICAgICAgICAgICAgICAgICAgIFxcUzVIXFwgICAgICAgICAgICAgICAgICAgXFxTNkhcXCAgICAgICAgICAgICAgICAgICBcXFM3SFxcICAgICAgICAgICAgICAgICAgIFxcUzhIXFwgICAgICAgICAgICAgICAgICBcblsyMV0gXFxTMVRcXCAgICAgICAgICAgICAgICAgICBcXFMyVFxcICAgICAgICAgICAgICAgICAgIFxcUzNUXFwgICAgICAgICAgICAgICAgICAgXFxTNFRcXCAgICAgICAgICAgICAgICAgICBcXFM1VFxcICAgICAgICAgICAgICAgICAgXG5bMjZdIFxcUzZUXFwgICAgICAgICAgICAgICAgICAgXFxTN1RcXCAgICAgICAgICAgICAgICAgICBcXFM4VFxcICAgICAgICAgICAgICAgICAgIFxcUzEuSHByb3BcXCAgICAgICAgICAgICAgXFxTMi5IcHJvcFxcICAgICAgICAgICAgIFxuWzMxXSBcXFMzLkhwcm9wXFwgICAgICAgICAgICAgIFxcUzQuSHByb3BcXCAgICAgICAgICAgICAgXFxTNS5IcHJvcFxcICAgICAgICAgICAgICBcXFM2Lkhwcm9wXFwgICAgICAgICAgICAgIFxcUzcuSHByb3BcXCAgICAgICAgICAgICBcblszNl0gXFxTOC5IcHJvcFxcICAgICAgICAgICAgIFxuIn0= --&gt;
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSBcIkxlYWRpbmcucmF6b3IucHJvdGVpblwiIFwiR2VuZS5uYW1lc1wiICAgICAgICAgICAgXCJQcm90ZWluLm5hbWVzXCIgICAgICAgICBcIkxhYmVsTFwiICAgICAgICAgICAgICAgXG4gWzVdIFwidDEuMUxcIiAgICAgICAgICAgICAgICAgXCJ0MS4yTFwiICAgICAgICAgICAgICAgICBcInQyLjFMXCIgICAgICAgICAgICAgICAgIFwidDIuMkxcIiAgICAgICAgICAgICAgICBcbiBbOV0gXCJ0My4xTFwiICAgICAgICAgICAgICAgICBcInQzLjJMXCIgICAgICAgICAgICAgICAgIFwidDQuMUxcIiAgICAgICAgICAgICAgICAgXCJ0NC4yTFwiICAgICAgICAgICAgICAgIFxuWzEzXSBcInQ1LjFMXCIgICAgICAgICAgICAgICAgIFwidDUuMkxcIiAgICAgICAgICAgICAgICAgXCJ0Ni4xTFwiICAgICAgICAgICAgICAgICBcInQ2LjJMXCIgICAgICAgICAgICAgICAgXG5bMTddIFwidDcuMUxcIiAgICAgICAgICAgICAgICAgXCJ0Ny4yTFwiICAgICAgICAgICAgICAgICBcInQ4LjFMXCIgICAgICAgICAgICAgICAgIFwidDguMkxcIiAgICAgICAgICAgICAgICBcblsyMV0gXCJMYWJlbEhcIiAgICAgICAgICAgICAgICBcInQxLjFIXCIgICAgICAgICAgICAgICAgIFwidDEuMkhcIiAgICAgICAgICAgICAgICAgXCJ0Mi4xSFwiICAgICAgICAgICAgICAgIFxuWzI1XSBcInQyLjJIXCIgICAgICAgICAgICAgICAgIFwidDMuMUhcIiAgICAgICAgICAgICAgICAgXCJ0My4ySFwiICAgICAgICAgICAgICAgICBcInQ0LjFIXCIgICAgICAgICAgICAgICAgXG5bMjldIFwidDQuMkhcIiAgICAgICAgICAgICAgICAgXCJ0NS4xSFwiICAgICAgICAgICAgICAgICBcInQ1LjJIXCIgICAgICAgICAgICAgICAgIFwidDYuMUhcIiAgICAgICAgICAgICAgICBcblszM10gXCJ0Ni4ySFwiICAgICAgICAgICAgICAgICBcInQ3LjFIXCIgICAgICAgICAgICAgICAgIFwidDcuMkhcIiAgICAgICAgICAgICAgICAgXCJ0OC4xSFwiICAgICAgICAgICAgICAgIFxuWzM3XSBcInQ4LjJIXCIgICAgICAgICAgICAgICAgIFwidDEuMVRcIiAgICAgICAgICAgICAgICAgXCJ0MS4yVFwiICAgICAgICAgICAgICAgICBcInQyLjFUXCIgICAgICAgICAgICAgICAgXG5bNDFdIFwidDIuMlRcIiAgICAgICAgICAgICAgICAgXCJ0My4xVFwiICAgICAgICAgICAgICAgICBcInQzLjJUXCIgICAgICAgICAgICAgICAgIFwidDQuMVRcIiAgICAgICAgICAgICAgICBcbls0NV0gXCJ0NC4yVFwiICAgICAgICAgICAgICAgICBcInQ1LjFUXCIgICAgICAgICAgICAgICAgIFwidDUuMlRcIiAgICAgICAgICAgICAgICAgXCJ0Ni4xVFwiICAgICAgICAgICAgICAgIFxuWzQ5XSBcInQ2LjJUXCIgICAgICAgICAgICAgICAgIFwidDcuMVRcIiAgICAgICAgICAgICAgICAgXCJ0Ny4yVFwiICAgICAgICAgICAgICAgICBcInQ4LjFUXCIgICAgICAgICAgICAgICAgXG5bNTNdIFwidDguMlRcIiAgICAgICAgICAgICAgICAgXCJ0MS4xLkhwcm9wXCIgICAgICAgICAgICBcInQxLjIuSHByb3BcIiAgICAgICAgICAgIFwidDIuMS5IcHJvcFwiICAgICAgICAgICBcbls1N10gXCJ0Mi4yLkhwcm9wXCIgICAgICAgICAgICBcInQzLjEuSHByb3BcIiAgICAgICAgICAgIFwidDMuMi5IcHJvcFwiICAgICAgICAgICAgXCJ0NC4xLkhwcm9wXCIgICAgICAgICAgIFxuWzYxXSBcInQ0LjIuSHByb3BcIiAgICAgICAgICAgIFwidDUuMS5IcHJvcFwiICAgICAgICAgICAgXCJ0NS4yLkhwcm9wXCIgICAgICAgICAgICBcInQ2LjEuSHByb3BcIiAgICAgICAgICAgXG5bNjVdIFwidDYuMi5IcHJvcFwiICAgICAgICAgICAgXCJ0Ny4xLkhwcm9wXCIgICAgICAgICAgICBcInQ3LjIuSHByb3BcIiAgICAgICAgICAgIFwidDguMS5IcHJvcFwiICAgICAgICAgICBcbls2OV0gXCJ0OC4yLkhwcm9wXCIgICAgICAgICAgIFxuIn0= -->
+<pre><code> [1] &quot;Leading.razor.protein&quot; &quot;Gene.names&quot;            &quot;Protein.names&quot;         &quot;LabelL&quot;               
+ [5] &quot;t1.1L&quot;                 &quot;t1.2L&quot;                 &quot;t2.1L&quot;                 &quot;t2.2L&quot;                
+ [9] &quot;t3.1L&quot;                 &quot;t3.2L&quot;                 &quot;t4.1L&quot;                 &quot;t4.2L&quot;                
+[13] &quot;t5.1L&quot;                 &quot;t5.2L&quot;                 &quot;t6.1L&quot;                 &quot;t6.2L&quot;                
+[17] &quot;t7.1L&quot;                 &quot;t7.2L&quot;                 &quot;t8.1L&quot;                 &quot;t8.2L&quot;                
+[21] &quot;LabelH&quot;                &quot;t1.1H&quot;                 &quot;t1.2H&quot;                 &quot;t2.1H&quot;                
+[25] &quot;t2.2H&quot;                 &quot;t3.1H&quot;                 &quot;t3.2H&quot;                 &quot;t4.1H&quot;                
+[29] &quot;t4.2H&quot;                 &quot;t5.1H&quot;                 &quot;t5.2H&quot;                 &quot;t6.1H&quot;                
+[33] &quot;t6.2H&quot;                 &quot;t7.1H&quot;                 &quot;t7.2H&quot;                 &quot;t8.1H&quot;                
+[37] &quot;t8.2H&quot;                 &quot;t1.1T&quot;                 &quot;t1.2T&quot;                 &quot;t2.1T&quot;                
+[41] &quot;t2.2T&quot;                 &quot;t3.1T&quot;                 &quot;t3.2T&quot;                 &quot;t4.1T&quot;                
+[45] &quot;t4.2T&quot;                 &quot;t5.1T&quot;                 &quot;t5.2T&quot;                 &quot;t6.1T&quot;                
+[49] &quot;t6.2T&quot;                 &quot;t7.1T&quot;                 &quot;t7.2T&quot;                 &quot;t8.1T&quot;                
+[53] &quot;t8.2T&quot;                 &quot;t1.1.Hprop&quot;            &quot;t1.2.Hprop&quot;            &quot;t2.1.Hprop&quot;           
+[57] &quot;t2.2.Hprop&quot;            &quot;t3.1.Hprop&quot;            &quot;t3.2.Hprop&quot;            &quot;t4.1.Hprop&quot;           
+[61] &quot;t4.2.Hprop&quot;            &quot;t5.1.Hprop&quot;            &quot;t5.2.Hprop&quot;            &quot;t6.1.Hprop&quot;           
+[65] &quot;t6.2.Hprop&quot;            &quot;t7.1.Hprop&quot;            &quot;t7.2.Hprop&quot;            &quot;t8.1.Hprop&quot;           
+[69] &quot;t8.2.Hprop&quot;           </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2FsbF90b3RhbCAtIGkuZS4gc3VtbWluZyBIICYgTCwgdmVyeSBzaW1wbGVcbmFsbF9wcm90X2FsbCA8LSByZWFkLmNzdihcIm1tYyBwcm90ZWlucyBBTEwgU0wgbm9ybWFsaXNlZC5jc3ZcIiwgc3RyaW5nc0FzRmFjdG9ycyA9IEYpXG5cbmBgYCJ9 -->
+<pre class="r"><code>#all_total - i.e. summing H &amp; L, very simple
+all_prot_all &lt;- read.csv(&quot;mmc proteins ALL SL normalised.csv&quot;, stringsAsFactors = F)
 </code></pre>
-<p>[1] .razor.protein .names  .names    1L <br />
-[6] 2L  3L  4L  5L  6L <br />
-[11] 7L  8L  1H  2H  3H <br />
-[16] 4H  5H  6H  7H  8H <br />
-[21] 1T  2T  3T  4T  5T <br />
-[26] 6T  7T  8T  1.Hprop  2.Hprop <br />
-[31] 3.Hprop  4.Hprop  5.Hprop  6.Hprop  7.Hprop <br />
-[36] 8.Hprop </p>
-<pre><code>
-
-
-&lt;!-- rnb-output-end --&gt;
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuI2FsbF90b3RhbCAtIGkuZS4gc3VtbWluZyBIICYgTCwgdmVyeSBzaW1wbGVcbmFsbF9wcm90X2FsbCA8LSByZWFkLmNzdihcXHcgcHJvdGVpbnMgQUxMIFNMIG5vcm1hbGlzZWQuY3N2XFwsIHN0cmluZ3NBc0ZhY3RvcnMgPSBGKVxuXG5gYGBcbmBgYCJ9 --&gt;
-
-```r
-```r
-#all_total - i.e. summing H &amp; L, very simple
-all_prot_all &lt;- read.csv(\w proteins ALL SL normalised.csv\, stringsAsFactors = F)
-</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-chunk-end --&gt;
-
-
-&lt;!-- rnb-text-begin --&gt;
-
-
-
-
-
-&lt;!-- rnb-text-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuI2NyZWF0ZSBzZXBhcmF0ZSBkYXRhIHRhYmxlcyBmb3Igc3ludGhlc2lzLCB0b3RhbFxuY29sbmFtZXMoYWxsX3Byb3QpXG5gYGBcbmBgYCJ9 --&gt;
-
-```r
-```r
-#create separate data tables for synthesis, total
-colnames(all_prot)</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-output-begin eyJkYXRhIjoiIFsxXSBcXExlYWRpbmcucmF6b3IucHJvdGVpblxcIFxcR2VuZS5uYW1lc1xcICAgICAgICAgICAgXFxQcm90ZWluLm5hbWVzXFwgICAgICAgICBcXExhYmVsXFwgICAgICAgICAgICAgICAgIFxcUzFMXFwgICAgICAgICAgICAgICAgICBcbiBbNl0gXFxTMkxcXCAgICAgICAgICAgICAgICAgICBcXFMzTFxcICAgICAgICAgICAgICAgICAgIFxcUzRMXFwgICAgICAgICAgICAgICAgICAgXFxTNUxcXCAgICAgICAgICAgICAgICAgICBcXFM2TFxcICAgICAgICAgICAgICAgICAgXG5bMTFdIFxcUzdMXFwgICAgICAgICAgICAgICAgICAgXFxTOExcXCAgICAgICAgICAgICAgICAgICBcXFMxSFxcICAgICAgICAgICAgICAgICAgIFxcUzJIXFwgICAgICAgICAgICAgICAgICAgXFxTM0hcXCAgICAgICAgICAgICAgICAgIFxuWzE2XSBcXFM0SFxcICAgICAgICAgICAgICAgICAgIFxcUzVIXFwgICAgICAgICAgICAgICAgICAgXFxTNkhcXCAgICAgICAgICAgICAgICAgICBcXFM3SFxcICAgICAgICAgICAgICAgICAgIFxcUzhIXFwgICAgICAgICAgICAgICAgICBcblsyMV0gXFxTMVRcXCAgICAgICAgICAgICAgICAgICBcXFMyVFxcICAgICAgICAgICAgICAgICAgIFxcUzNUXFwgICAgICAgICAgICAgICAgICAgXFxTNFRcXCAgICAgICAgICAgICAgICAgICBcXFM1VFxcICAgICAgICAgICAgICAgICAgXG5bMjZdIFxcUzZUXFwgICAgICAgICAgICAgICAgICAgXFxTN1RcXCAgICAgICAgICAgICAgICAgICBcXFM4VFxcICAgICAgICAgICAgICAgICAgIFxcUzEuSHByb3BcXCAgICAgICAgICAgICAgXFxTMi5IcHJvcFxcICAgICAgICAgICAgIFxuWzMxXSBcXFMzLkhwcm9wXFwgICAgICAgICAgICAgIFxcUzQuSHByb3BcXCAgICAgICAgICAgICAgXFxTNS5IcHJvcFxcICAgICAgICAgICAgICBcXFM2Lkhwcm9wXFwgICAgICAgICAgICAgIFxcUzcuSHByb3BcXCAgICAgICAgICAgICBcblszNl0gXFxTOC5IcHJvcFxcICAgICAgICAgICAgIFxuIn0= --&gt;
-</code></pre>
-<p>[1] .razor.protein .names  .names    1L <br />
-[6] 2L  3L  4L  5L  6L <br />
-[11] 7L  8L  1H  2H  3H <br />
-[16] 4H  5H  6H  7H  8H <br />
-[21] 1T  2T  3T  4T  5T <br />
-[26] 6T  7T  8T  1.Hprop  2.Hprop <br />
-[31] 3.Hprop  4.Hprop  5.Hprop  6.Hprop  7.Hprop <br />
-[36] 8.Hprop </p>
-<pre><code>
-
-
-&lt;!-- rnb-output-end --&gt;
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuc3luIDwtIGFsbF9wcm90W2MoMTozLCAxMzoyMCldICNzeW50aGVzaXMgLSBqdXN0IHRoZSBoZWF2eSBpbiBzaWxhYyBzYW1wbGVzXG50b3RhbCA8LSAgYWxsX3Byb3RbYygxOjMsIDIxOjI4KV1cblxuYGBgXG5gYGAifQ== --&gt;
-
-```r
-```r
-syn &lt;- all_prot[c(1:3, 13:20)] #synthesis - just the heavy in silac samples
-total &lt;-  all_prot[c(1:3, 21:28)]
-</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-chunk-end --&gt;
-
-
-&lt;!-- rnb-text-begin --&gt;
-
-
-
-&lt;!-- rnb-text-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuI2Z1bmN0aW9uIGZvciBSQUlOXG5cbm1ha2VpdHJhaW4gPC0gZnVuY3Rpb24oZGYsIHBjdXRvZmYpIHtcbiAgUkFJTl9pbiA8LSB0KGRmWzQ6MTFdKSAjVHJhbnNwb3NlIGRhdGEgb25seSBjb2x1bW5zLCB0byBjcmVhdGUgdGhlIGlucHV0cyBmb3IgUkFJTlxuICBSQUlOX291dCA8LSBhcy5kYXRhLmZyYW1lKG1hdHJpeCgwLG5yb3coUkFJTl9pbiksIDQpKSAjY3JlYXRlIG1hdHJpeCBmb3IgUkFJTiBvdXRwdXRcbiAgI1JBSU4gcGFyYW1ldGVyc1xuICBzdGVwID0gNiAjbnVtYmVyIG9mIGhvdXJzIGJldHdlZW4gdGltZXBvaW50c1xuICBwZXJpb2QgPSAyNCAjc3BlY2lmeSBwZXJpb2QgbGVuZ3RoIHRvIHRlc3QgZm9yXG4gIHJlcCA9IDEgI251bWJlciBvZiBiaW9sb2dpY2FsIHJlcGxpY2F0ZXNcbiAgI2RvIHJhaW5cbiAgUkFJTl9vdXQgPC0gcmFpbihSQUlOX2luLCBzdGVwLCBwZXJpb2QsIG5yLnNlcmllcyA9IHJlcClcbiAgI2FkZCBiYWNrIGdlbmUgbmFtZXMgYW5kIG90aGVyIHByb3RlaW4gaW5mb1xuICBSQUlOX291dCA8LSBjYmluZChkZlsxOjNdLCBSQUlOX291dCwgZGZbNDoxMV0pXG4gICNwcmludCBsaXN0ICYgcHJvcG9ydGlvbiBvZiBwcm90ZWlucyBcXHJoeXRobWljXFwsIGVnIDwwLjA1IHAgKGJ1dCBjb3VsZCBjaGFuZ2UpXG4gIHN1YnNldChSQUlOX291dCwgcFZhbDwwLjA1KVxuICBwcmludChjKFxccGVyY2VudGFnZSByaHl0aG1pYyB3aXRoIGN1dG9mZlxcLCBucm93KHN1YnNldChSQUlOX291dCwgcFZhbDxwY3V0b2ZmKSkvbnJvdyhSQUlOX291dCkpKVxuICAjYWRkIHJlbGF0aXZlIGFtcGxpdHVkZSBjYWxjdWxhdGlvbiBhdCBvbmNlICsgYmFzZWxpbmUgKGF2ZXJhZ2UgZXhwcmVzc2lvbilcbiAgUkFJTl9vdXQkQXZfZXhwciA8LSBhcHBseShSQUlOX291dFs4OjE1XSwgMSwgbWVhbilcbiAgUkFJTl9vdXQkQW1wbGl0dWRlIDwtIGFwcGx5KFJBSU5fb3V0Wzg6MTVdLCAxLCBmdW5jdGlvbih4KSAoKG1heCh4KS1taW4oeCkpL21lYW4oeCkpKVxuICAjYWRkIHZhcmlhbmNlXG4gIFJBSU5fb3V0JENWIDwtIGFwcGx5KFJBSU5fb3V0Wzg6MTVdLCAxLCBmdW5jdGlvbih4KSBzZChhcy5udW1lcmljKHgpKS9tZWFuKGFzLm51bWVyaWMoeCkpKVxuICByZXR1cm4oUkFJTl9vdXQpIH1cblxuXG5cbmBgYFxuYGBgIn0= --&gt;
-
-```r
-```r
-#function for RAIN
-
-makeitrain &lt;- function(df, pcutoff) {
-  RAIN_in &lt;- t(df[4:11]) #Transpose data only columns, to create the inputs for RAIN
-  RAIN_out &lt;- as.data.frame(matrix(0,nrow(RAIN_in), 4)) #create matrix for RAIN output
-  #RAIN parameters
-  step = 6 #number of hours between timepoints
-  period = 24 #specify period length to test for
-  rep = 1 #number of biological replicates
-  #do rain
-  RAIN_out &lt;- rain(RAIN_in, step, period, nr.series = rep)
-  #add back gene names and other protein info
-  RAIN_out &lt;- cbind(df[1:3], RAIN_out, df[4:11])
-  #print list &amp; proportion of proteins \rhythmic\, eg &lt;0.05 p (but could change)
-  subset(RAIN_out, pVal&lt;0.05)
-  print(c(\percentage rhythmic with cutoff\, nrow(subset(RAIN_out, pVal&lt;pcutoff))/nrow(RAIN_out)))
-  #add relative amplitude calculation at once + baseline (average expression)
-  RAIN_out$Av_expr &lt;- apply(RAIN_out[8:15], 1, mean)
-  RAIN_out$Amplitude &lt;- apply(RAIN_out[8:15], 1, function(x) ((max(x)-min(x))/mean(x)))
-  #add variance
-  RAIN_out$CV &lt;- apply(RAIN_out[8:15], 1, function(x) sd(as.numeric(x))/mean(as.numeric(x)))
-  return(RAIN_out) }
-</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-chunk-end --&gt;
-
-
-&lt;!-- rnb-text-begin --&gt;
-
-
-
-
-
-&lt;!-- rnb-text-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxudG90YWxfUiA8LSBtYWtlaXRyYWluKHRvdGFsLCAwLjA1KSAjNi4yJSByaHksIDI1JSBSQVxuXG5gYGBcbmBgYCJ9 --&gt;
-
-```r
-```r
-total_R &lt;- makeitrain(total, 0.05) #6.2% rhy, 25% RA
-</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-output-begin eyJkYXRhIjoiWzFdIFxccGVyY2VudGFnZSByaHl0aG1pYyB3aXRoIGN1dG9mZlxcIFxcMC4wNjIxMDQ0MzAzNzk3NDY4XFwgICAgICAgICAgICAgXG4ifQ== --&gt;
-</code></pre>
-<p>[1] rhythmic with cutoff \0.0621044303797468 </p>
-<pre><code>
-
-
-&lt;!-- rnb-output-end --&gt;
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuc3luX1IgPC0gbWFrZWl0cmFpbihzeW4sIDAuMDUpICM1LjklIHJoeSwgMzAlIFJBXG5gYGBcbmBgYCJ9 --&gt;
-
-```r
-```r
-syn_R &lt;- makeitrain(syn, 0.05) #5.9% rhy, 30% RA</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-output-begin eyJkYXRhIjoiWzFdIFxccGVyY2VudGFnZSByaHl0aG1pYyB3aXRoIGN1dG9mZlxcIFxcMC4wNTkzMzU0NDMwMzc5NzQ3XFwgICAgICAgICAgICAgXG4ifQ== --&gt;
-</code></pre>
-<p>[1] rhythmic with cutoff \0.0593354430379747 </p>
-<pre><code>
-
-
-&lt;!-- rnb-output-end --&gt;
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYWxsdG90YWxfUiA8LSBtYWtlaXRyYWluKGFsbF9wcm90X2FsbCwgMC4wNSkgIzclIHJoeSwgMjUlIFJBXG5gYGBcbmBgYCJ9 --&gt;
-
-```r
-```r
-alltotal_R &lt;- makeitrain(all_prot_all, 0.05) #7% rhy, 25% RA</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-output-begin eyJkYXRhIjoiWzFdIFxccGVyY2VudGFnZSByaHl0aG1pYyB3aXRoIGN1dG9mZlxcIFxcMC4wNzAyNDI2NTY0NDk1NTNcXCAgICAgICAgICAgICAgXG4ifQ== --&gt;
-</code></pre>
-<p>[1] rhythmic with cutoff \0.070242656449553 </p>
-<pre><code>
-
-
-&lt;!-- rnb-output-end --&gt;
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxud3JpdGUuY3N2KHRvdGFsX1IsIFxcdyBwcm90ZWlucyBmaWx0ZXJlZCB0b3RhbCBSQUlOLmNzdlxcLCByb3cubmFtZXMgPSBGKVxud3JpdGUuY3N2KHN5bl9SLCBcXHcgcHJvdGVpbnMgZmlsdGVyZWQgc3luIFJBSU4uY3N2XFwsIHJvdy5uYW1lcyA9IEYpXG53cml0ZS5jc3YoYWxsdG90YWxfUiwgXFx3IHByb3RlaW5zIGFsbCBub24tZmlsdGVyZWQgUkFJTi5jc3ZcXCwgcm93Lm5hbWVzID0gRilcbmBgYFxuYGBgIn0= --&gt;
-
-```r
-```r
-write.csv(total_R, \w proteins filtered total RAIN.csv\, row.names = F)
-write.csv(syn_R, \w proteins filtered syn RAIN.csv\, row.names = F)
-write.csv(alltotal_R, \w proteins all non-filtered RAIN.csv\, row.names = F)</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-chunk-end --&gt;
-
-
-&lt;!-- rnb-text-begin --&gt;
-
-
-
-
-
-&lt;!-- rnb-text-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuXG5mb2xkX2NoYW5nZV9hbm92YSA8LSBmdW5jdGlvbihkZikge1xuZGZfRkMgPC0gZGZbMToxNV1cbmZvciAoaSBpbiAxOm5yb3coZGZfRkMpKSB7XG5lZyA8LSBkZltpLCA4OjE1XVxuZGF5X2F2IDwtIGMocm93TWVhbnMoZWdbYygxLCA1KV0pLCByb3dNZWFucyhlZ1tjKDIsIDYpXSksIHJvd01lYW5zKGVnW2MoMywgNyldKSwgcm93TWVhbnMoZWdbYyg0LCA4KV0pKVxuRkMgPC0gbWF4KGRheV9hdikvbWluKGRheV9hdilcbmRmX0ZDW2ksIFxcRkNhdlxcXSA8LSBGQ1xuI2Fub3ZhXG5lZ2RmIDwtIGdhdGhlcihlZylcbmVnZGYkdGltZSA8LSByZXAocGFzdGUwKFxcdFxcLCBzZXEoMSwgNCwgMSkpLCAyKVxuI25lZWQgdG8gbG9nMiB0aGUgdmFsdWVzIVxuZWdkZiR2YWx1ZWxvZzIgPC0gbG9nMihlZ2RmJHZhbHVlKVxucmVzLmFvdiA8LSBhb3YodmFsdWVsb2cyIH4gdGltZSwgZGF0YSA9IGVnZGYpXG5kZl9GQ1tpLFxcYW5vdmFfcHZhbFxcXSA8LSBzdW1tYXJ5KHJlcy5hb3YpW1sxXV1bMSw1XVxufVxuI2RmX0ZDJGFub3ZhX0JIYWRqcHZhbCA8LSBwLmFkanVzdChkZl9GQyRhbm92YV9wdmFsLCBtZXRob2Q9XFxCSFxcKVxuc3Vic2V0KGRmX0ZDLCBhbm92YV9wdmFsPDAuMDUpXG5wcmludChucm93KHN1YnNldChkZl9GQywgYW5vdmFfcHZhbDwwLjA1KSkvbnJvdyhkZl9GQykpXG5yZXR1cm4oZGZfRkMpXG59XG5cbnRvdF9SX2F2RkMyIDwtIGZvbGRfY2hhbmdlX2Fub3ZhKHRvdGFsX1IpICMzLjMlXG5cbmBgYFxuYGBgIn0= --&gt;
-
-```r
-```r
-
-fold_change_anova &lt;- function(df) {
-df_FC &lt;- df[1:15]
-for (i in 1:nrow(df_FC)) {
-eg &lt;- df[i, 8:15]
-day_av &lt;- c(rowMeans(eg[c(1, 5)]), rowMeans(eg[c(2, 6)]), rowMeans(eg[c(3, 7)]), rowMeans(eg[c(4, 8)]))
-FC &lt;- max(day_av)/min(day_av)
-df_FC[i, \FCav\] &lt;- FC
-#anova
-egdf &lt;- gather(eg)
-egdf$time &lt;- rep(paste0(\t\, seq(1, 4, 1)), 2)
-#need to log2 the values!
-egdf$valuelog2 &lt;- log2(egdf$value)
-res.aov &lt;- aov(valuelog2 ~ time, data = egdf)
-df_FC[i,\anova_pval\] &lt;- summary(res.aov)[[1]][1,5]
-}
-#df_FC$anova_BHadjpval &lt;- p.adjust(df_FC$anova_pval, method=\BH\)
-subset(df_FC, anova_pval&lt;0.05)
-print(nrow(subset(df_FC, anova_pval&lt;0.05))/nrow(df_FC))
-return(df_FC)
-}
-
-tot_R_avFC2 &lt;- fold_change_anova(total_R) #3.3%
-</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuMDMyODMyMjhcbiJ9 --&gt;
-</code></pre>
-<p>[1] 0.03283228</p>
-<pre><code>
-
-
-&lt;!-- rnb-output-end --&gt;
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuc3luX1JfYXZGQzIgPC0gZm9sZF9jaGFuZ2VfYW5vdmEoc3luX1IpICMyLjYlXG5gYGBcbmBgYCJ9 --&gt;
-
-```r
-```r
-syn_R_avFC2 &lt;- fold_change_anova(syn_R) #2.6%</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuMDI2MTA3NTlcbiJ9 --&gt;
-</code></pre>
-<p>[1] 0.02610759</p>
-<pre><code>
-
-
-&lt;!-- rnb-output-end --&gt;
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubWVkaWFuKHN5bl9SX2F2RkMyJEZDYXYpXG5gYGBcbmBgYCJ9 --&gt;
-
-```r
-```r
-median(syn_R_avFC2$FCav)</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-output-begin eyJkYXRhIjoiWzFdIDEuMTU0NzNcbiJ9 --&gt;
-</code></pre>
-<p>[1] 1.15473</p>
-<pre><code>
-
-
-&lt;!-- rnb-output-end --&gt;
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubWVkaWFuKHRvdF9SX2F2RkMyJEZDYXYpXG5gYGBcbmBgYCJ9 --&gt;
-
-```r
-```r
-median(tot_R_avFC2$FCav)</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-output-begin eyJkYXRhIjoiWzFdIDEuMTI4ODEzXG4ifQ== --&gt;
-</code></pre>
-<p>[1] 1.128813</p>
-<pre><code>
-
-
-&lt;!-- rnb-output-end --&gt;
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxud3JpdGUuY3N2KHN5bl9SX2F2RkMyLCBcXHcgcHJvdGVpbnMgc3luIFJBSU4gYXZGQyBBTk9WQS5jc3ZcXCwgcm93Lm5hbWVzID0gRilcbndyaXRlLmNzdih0b3RfUl9hdkZDMiwgXFx3IHByb3RlaW5zIHRvdGFsIFJBSU4gYXZGQyBBTk9WQS5jc3ZcXCwgcm93Lm5hbWVzID0gRilcbmBgYFxuYGBgIn0= --&gt;
-
-```r
-```r
-write.csv(syn_R_avFC2, \w proteins syn RAIN avFC ANOVA.csv\, row.names = F)
-write.csv(tot_R_avFC2, \w proteins total RAIN avFC ANOVA.csv\, row.names = F)</code></pre>
-<p>```</p>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2NyZWF0ZSBzZXBhcmF0ZSBkYXRhIHRhYmxlcyBmb3Igc3ludGhlc2lzLCB0b3RhbFxuXG5zeW4gPC0gYWxsX3Byb3RbYygxOjMsIDIyOjM3KV0gI3N5bnRoZXNpcyAtIGp1c3QgdGhlIGhlYXZ5IGluIHNpbGFjIHNhbXBsZXNcbkhfcHJvcCA8LSBhbGxfcHJvdFtjKDE6MywgNTQ6NjkpXSAjSGVhdnkvVG90YWwgPSBwcm9wb3J0aW9uIG9mIGhlYXZ5LCByZWxhdGl2ZSB0dXJub3ZlclxudG90YWwgPC0gIGFsbF9wcm90W2MoMTozLCAzODo1MyldXG5cbmBgYCJ9 -->
+<pre class="r"><code>#create separate data tables for synthesis, total
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiU0lMQUMtVE1UIHRpbWVjb3Vyc2UgLSB0YWtpbmcgbm9ybWFsaXNlZCBkYXRhIGZvciByaHl0aG1pY2l0eSBhbmFseXNpcyIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKCmBgYHtyfQojc2V0dXAKCiNjbGVhciB5b3VyIHdvcmtzcGFjZQpybShsaXN0PWxzKCkpCgojTG9hZCB1c2VmdWwgcGFja2FnZXMKCmlmICghcmVxdWlyZSgidGlkeXZlcnNlIikpIHsKICBpbnN0YWxsLnBhY2thZ2VzKCJ0aWR5dmVyc2UiLCBkZXBlbmRlbmNpZXMgPSBUUlVFKQogIGxpYnJhcnkodGlkeXZlcnNlKQp9CgoKaWYgKCFyZXF1aXJlKCJyYWluIikpIHsKICBCaW9jTWFuYWdlcjo6aW5zdGFsbCgicmFpbiIpCiAgbGlicmFyeShyYWluKQp9CgoKCiNtYWtlIGEgbGlzdCBvZiBhbGwgdGhlIC5jc3YgZmlsZXMgaW4geW91ciB3b3JraW5nIGRpcmVjdG9yeSBqdXN0IHNvIHlvdSBjYW4gc2VlIHdoYXQncyBnb2luZyBvbgpYID0gbGlzdC5maWxlcygiLiIsIi5jc3YiKQpYCgojbG9hZCBpbiB0aGUgZ3JvdXBlZCBwcm90ZWlucyArIHRoZSByYXRpb3MgY2FsY3VsYXRlZCAoZG8gUkFJTiBvbiB0aGF0IGZvciBub3cpCgphbGxfcHJvdCA8LSByZWFkLmNzdigidyBwcm90ZWlucyBITCB0b2dldGhlciBTTCBub3JtYWxpc2VkLmNzdiIsIHN0cmluZ3NBc0ZhY3RvcnMgPSBGKQpjb2xuYW1lcyhhbGxfcHJvdCkKCiNhbGxfdG90YWwgLSBpLmUuIHN1bW1pbmcgSCAmIEwsIHZlcnkgc2ltcGxlCmFsbF9wcm90X2FsbCA8LSByZWFkLmNzdigidyBwcm90ZWlucyBBTEwgU0wgbm9ybWFsaXNlZC5jc3YiLCBzdHJpbmdzQXNGYWN0b3JzID0gRikKCmBgYAoKCgpgYGB7cn0KI2NyZWF0ZSBzZXBhcmF0ZSBkYXRhIHRhYmxlcyBmb3Igc3ludGhlc2lzLCB0b3RhbApjb2xuYW1lcyhhbGxfcHJvdCkKCnN5biA8LSBhbGxfcHJvdFtjKDE6MywgMTM6MjApXSAjc3ludGhlc2lzIC0ganVzdCB0aGUgaGVhdnkgaW4gc2lsYWMgc2FtcGxlcwp0b3RhbCA8LSAgYWxsX3Byb3RbYygxOjMsIDIxOjI4KV0KCmBgYAoKYGBge3J9CiNmdW5jdGlvbiBmb3IgUkFJTgoKbWFrZWl0cmFpbiA8LSBmdW5jdGlvbihkZiwgcGN1dG9mZikgewogIFJBSU5faW4gPC0gdChkZls0OjExXSkgI1RyYW5zcG9zZSBkYXRhIG9ubHkgY29sdW1ucywgdG8gY3JlYXRlIHRoZSBpbnB1dHMgZm9yIFJBSU4KICBSQUlOX291dCA8LSBhcy5kYXRhLmZyYW1lKG1hdHJpeCgwLG5yb3coUkFJTl9pbiksIDQpKSAjY3JlYXRlIG1hdHJpeCBmb3IgUkFJTiBvdXRwdXQKICAjUkFJTiBwYXJhbWV0ZXJzCiAgc3RlcCA9IDYgI251bWJlciBvZiBob3VycyBiZXR3ZWVuIHRpbWVwb2ludHMKICBwZXJpb2QgPSAyNCAjc3BlY2lmeSBwZXJpb2QgbGVuZ3RoIHRvIHRlc3QgZm9yCiAgcmVwID0gMSAjbnVtYmVyIG9mIGJpb2xvZ2ljYWwgcmVwbGljYXRlcwogICNkbyByYWluCiAgUkFJTl9vdXQgPC0gcmFpbihSQUlOX2luLCBzdGVwLCBwZXJpb2QsIG5yLnNlcmllcyA9IHJlcCkKICAjYWRkIGJhY2sgZ2VuZSBuYW1lcyBhbmQgb3RoZXIgcHJvdGVpbiBpbmZvCiAgUkFJTl9vdXQgPC0gY2JpbmQoZGZbMTozXSwgUkFJTl9vdXQsIGRmWzQ6MTFdKQogICNwcmludCBsaXN0ICYgcHJvcG9ydGlvbiBvZiBwcm90ZWlucyAicmh5dGhtaWMiLCBlZyA8MC4wNSBwIChidXQgY291bGQgY2hhbmdlKQogIHN1YnNldChSQUlOX291dCwgcFZhbDwwLjA1KQogIHByaW50KGMoInBlcmNlbnRhZ2Ugcmh5dGhtaWMgd2l0aCBjdXRvZmYiLCBucm93KHN1YnNldChSQUlOX291dCwgcFZhbDxwY3V0b2ZmKSkvbnJvdyhSQUlOX291dCkpKQogICNhZGQgcmVsYXRpdmUgYW1wbGl0dWRlIGNhbGN1bGF0aW9uIGF0IG9uY2UgKyBiYXNlbGluZSAoYXZlcmFnZSBleHByZXNzaW9uKQogIFJBSU5fb3V0JEF2X2V4cHIgPC0gYXBwbHkoUkFJTl9vdXRbODoxNV0sIDEsIG1lYW4pCiAgUkFJTl9vdXQkQW1wbGl0dWRlIDwtIGFwcGx5KFJBSU5fb3V0Wzg6MTVdLCAxLCBmdW5jdGlvbih4KSAoKG1heCh4KS1taW4oeCkpL21lYW4oeCkpKQogICNhZGQgdmFyaWFuY2UKICBSQUlOX291dCRDViA8LSBhcHBseShSQUlOX291dFs4OjE1XSwgMSwgZnVuY3Rpb24oeCkgc2QoYXMubnVtZXJpYyh4KSkvbWVhbihhcy5udW1lcmljKHgpKSkKICByZXR1cm4oUkFJTl9vdXQpIH0KCgoKYGBgCgoKCmBgYHtyfQoKdG90YWxfUiA8LSBtYWtlaXRyYWluKHRvdGFsLCAwLjA1KSAjNi4yJSByaHksIDI1JSBSQQpzeW5fUiA8LSBtYWtlaXRyYWluKHN5biwgMC4wNSkgIzUuOSUgcmh5LCAzMCUgUkEKYWxsdG90YWxfUiA8LSBtYWtlaXRyYWluKGFsbF9wcm90X2FsbCwgMC4wNSkgIzclIHJoeSwgMjUlIFJBCgp3cml0ZS5jc3YodG90YWxfUiwgIncgcHJvdGVpbnMgZmlsdGVyZWQgdG90YWwgUkFJTi5jc3YiLCByb3cubmFtZXMgPSBGKQp3cml0ZS5jc3Yoc3luX1IsICJ3IHByb3RlaW5zIGZpbHRlcmVkIHN5biBSQUlOLmNzdiIsIHJvdy5uYW1lcyA9IEYpCndyaXRlLmNzdihhbGx0b3RhbF9SLCAidyBwcm90ZWlucyBhbGwgbm9uLWZpbHRlcmVkIFJBSU4uY3N2Iiwgcm93Lm5hbWVzID0gRikKCgpgYGAKCgoKYGBge3J9CiNhbHRlcm5hdGl2ZWx5LCB0cnkgdG8gYXZlcmFnZSAyZGF5cyBmaXJzdCArIGRvIEFOT1ZBCgpmb2xkX2NoYW5nZV9hbm92YSA8LSBmdW5jdGlvbihkZikgewpkZl9GQyA8LSBkZlsxOjE1XQpmb3IgKGkgaW4gMTpucm93KGRmX0ZDKSkgewplZyA8LSBkZltpLCA4OjE1XQpkYXlfYXYgPC0gYyhyb3dNZWFucyhlZ1tjKDEsIDUpXSksIHJvd01lYW5zKGVnW2MoMiwgNildKSwgcm93TWVhbnMoZWdbYygzLCA3KV0pLCByb3dNZWFucyhlZ1tjKDQsIDgpXSkpCkZDIDwtIG1heChkYXlfYXYpL21pbihkYXlfYXYpCmRmX0ZDW2ksICJGQ2F2Il0gPC0gRkMKI2Fub3ZhCmVnZGYgPC0gZ2F0aGVyKGVnKQplZ2RmJHRpbWUgPC0gcmVwKHBhc3RlMCgidCIsIHNlcSgxLCA0LCAxKSksIDIpCiNuZWVkIHRvIGxvZzIgdGhlIHZhbHVlcyEKZWdkZiR2YWx1ZWxvZzIgPC0gbG9nMihlZ2RmJHZhbHVlKQpyZXMuYW92IDwtIGFvdih2YWx1ZWxvZzIgfiB0aW1lLCBkYXRhID0gZWdkZikKZGZfRkNbaSwiYW5vdmFfcHZhbCJdIDwtIHN1bW1hcnkocmVzLmFvdilbWzFdXVsxLDVdCn0KI2RmX0ZDJGFub3ZhX0JIYWRqcHZhbCA8LSBwLmFkanVzdChkZl9GQyRhbm92YV9wdmFsLCBtZXRob2Q9IkJIIikKc3Vic2V0KGRmX0ZDLCBhbm92YV9wdmFsPDAuMDUpCnByaW50KG5yb3coc3Vic2V0KGRmX0ZDLCBhbm92YV9wdmFsPDAuMDUpKS9ucm93KGRmX0ZDKSkKcmV0dXJuKGRmX0ZDKQp9Cgp0b3RfUl9hdkZDMiA8LSBmb2xkX2NoYW5nZV9hbm92YSh0b3RhbF9SKSAjMy4zJQpzeW5fUl9hdkZDMiA8LSBmb2xkX2NoYW5nZV9hbm92YShzeW5fUikgIzIuNiUKCm1lZGlhbihzeW5fUl9hdkZDMiRGQ2F2KQptZWRpYW4odG90X1JfYXZGQzIkRkNhdikKCgoKd3JpdGUuY3N2KHN5bl9SX2F2RkMyLCAidyBwcm90ZWlucyBzeW4gUkFJTiBhdkZDIEFOT1ZBLmNzdiIsIHJvdy5uYW1lcyA9IEYpCndyaXRlLmNzdih0b3RfUl9hdkZDMiwgIncgcHJvdGVpbnMgdG90YWwgUkFJTiBhdkZDIEFOT1ZBLmNzdiIsIHJvdy5uYW1lcyA9IEYpCiAKCmBgYAoKCgo=</div>
+syn &lt;- all_prot[c(1:3, 22:37)] #synthesis - just the heavy in silac samples
+H_prop &lt;- all_prot[c(1:3, 54:69)] #Heavy/Total = proportion of heavy, relative turnover
+total &lt;-  all_prot[c(1:3, 38:53)]
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2Z1bmN0aW9uIGZvciBSQUlOXG5cbm1ha2VpdHJhaW4gPC0gZnVuY3Rpb24oZGYsIHBjdXRvZmYpIHtcbiAgUkFJTl9pbiA8LSB0KGRmWzQ6MTldKSAjVHJhbnNwb3NlIGRhdGEgb25seSBjb2x1bW5zLCB0byBjcmVhdGUgdGhlIGlucHV0cyBmb3IgUkFJTlxuICBSQUlOX291dCA8LSBhcy5kYXRhLmZyYW1lKG1hdHJpeCgwLG5yb3coUkFJTl9pbiksIDQpKSAjY3JlYXRlIG1hdHJpeCBmb3IgUkFJTiBvdXRwdXRcbiAgI1JBSU4gcGFyYW1ldGVyc1xuICBzdGVwID0gNiAjbnVtYmVyIG9mIGhvdXJzIGJldHdlZW4gdGltZXBvaW50c1xuICBwZXJpb2QgPSAyNCAjc3BlY2lmeSBwZXJpb2QgbGVuZ3RoIHRvIHRlc3QgZm9yXG4gIHJlcCA9IDIgI251bWJlciBvZiBiaW9sb2dpY2FsIHJlcGxpY2F0ZXNcbiAgI2RvIHJhaW5cbiAgUkFJTl9vdXQgPC0gcmFpbihSQUlOX2luLCBzdGVwLCBwZXJpb2QsIG5yLnNlcmllcyA9IHJlcClcbiAgI2FkZCBiYWNrIGdlbmUgbmFtZXMgYW5kIG90aGVyIHByb3RlaW4gaW5mb1xuICBSQUlOX291dCA8LSBjYmluZChkZlsxOjNdLCBSQUlOX291dCwgZGZbNDoxOV0pXG4gICNwcmludCBsaXN0ICYgcHJvcG9ydGlvbiBvZiBwcm90ZWlucyBcInJoeXRobWljXCIsIGVnIDwwLjA1IHAgKGJ1dCBjb3VsZCBjaGFuZ2UpXG4gIHN1YnNldChSQUlOX291dCwgcFZhbDwwLjA1KVxuICBwcmludChjKFwicGVyY2VudGFnZSByaHl0aG1pYyB3aXRoIGN1dG9mZlwiLCBucm93KHN1YnNldChSQUlOX291dCwgcFZhbDxwY3V0b2ZmKSkvbnJvdyhSQUlOX291dCkpKVxuICAjYWRkIHJlbGF0aXZlIGFtcGxpdHVkZSBjYWxjdWxhdGlvbiBhdCBvbmNlICsgYmFzZWxpbmUgKGF2ZXJhZ2UgZXhwcmVzc2lvbilcbiAgUkFJTl9vdXQkQXZfZXhwciA8LSBhcHBseShSQUlOX291dFs4OjIzXSwgMSwgbWVhbilcbiAgUkFJTl9vdXQkQW1wbGl0dWRlIDwtIGFwcGx5KFJBSU5fb3V0Wzg6MjNdLCAxLCBmdW5jdGlvbih4KSAoKG1heCh4KS1taW4oeCkpL21lYW4oeCkpKVxuICBwcmludChjKFwiYW1wbGl0dWRlIG9mIGFsbCAmIHJoeXRobWljXCIsIG1lZGlhbihSQUlOX291dCRBbXBsaXR1ZGUpLCBtZWRpYW4oc3Vic2V0KFJBSU5fb3V0LCBwVmFsPHBjdXRvZmYpJEFtcGxpdHVkZSkpKVxuICAjYWRkIHZhcmlhbmNlXG4gIFJBSU5fb3V0JENWIDwtIGFwcGx5KFJBSU5fb3V0Wzg6MjNdLCAxLCBmdW5jdGlvbih4KSBzZChhcy5udW1lcmljKHgpKS9tZWFuKGFzLm51bWVyaWMoeCkpKVxuICByZXR1cm4oUkFJTl9vdXQpIH1cblxuICBcblxuYGBgIn0= -->
+<pre class="r"><code>#function for RAIN
+
+makeitrain &lt;- function(df, pcutoff) {
+  RAIN_in &lt;- t(df[4:19]) #Transpose data only columns, to create the inputs for RAIN
+  RAIN_out &lt;- as.data.frame(matrix(0,nrow(RAIN_in), 4)) #create matrix for RAIN output
+  #RAIN parameters
+  step = 6 #number of hours between timepoints
+  period = 24 #specify period length to test for
+  rep = 2 #number of biological replicates
+  #do rain
+  RAIN_out &lt;- rain(RAIN_in, step, period, nr.series = rep)
+  #add back gene names and other protein info
+  RAIN_out &lt;- cbind(df[1:3], RAIN_out, df[4:19])
+  #print list &amp; proportion of proteins &quot;rhythmic&quot;, eg &lt;0.05 p (but could change)
+  subset(RAIN_out, pVal&lt;0.05)
+  print(c(&quot;percentage rhythmic with cutoff&quot;, nrow(subset(RAIN_out, pVal&lt;pcutoff))/nrow(RAIN_out)))
+  #add relative amplitude calculation at once + baseline (average expression)
+  RAIN_out$Av_expr &lt;- apply(RAIN_out[8:23], 1, mean)
+  RAIN_out$Amplitude &lt;- apply(RAIN_out[8:23], 1, function(x) ((max(x)-min(x))/mean(x)))
+  print(c(&quot;amplitude of all &amp; rhythmic&quot;, median(RAIN_out$Amplitude), median(subset(RAIN_out, pVal&lt;pcutoff)$Amplitude)))
+  #add variance
+  RAIN_out$CV &lt;- apply(RAIN_out[8:23], 1, function(x) sd(as.numeric(x))/mean(as.numeric(x)))
+  return(RAIN_out) }
+
+  
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2FsbCB0b2Fsc1xuXG50b3RhbF9SIDwtIG1ha2VpdHJhaW4odG90YWwsIDAuMDUpIFxuYGBgIn0= -->
+<pre class="r"><code>#all toals
+
+total_R &lt;- makeitrain(total, 0.05) </code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwicGVyY2VudGFnZSByaHl0aG1pYyB3aXRoIGN1dG9mZlwiIFwiMC4yODkwNjI1XCIgICAgICAgICAgICAgICAgICAgICAgXG5bMV0gXCJhbXBsaXR1ZGUgb2YgYWxsICYgcmh5dGhtaWNcIiBcIjAuNDY0MTgzNjgwNTUzNDc4XCIgICAgICAgICAgIFwiMC40NjY5MTU3MjI4NzIwODlcIiAgICAgICAgICBcbiJ9 -->
+<pre><code>[1] &quot;percentage rhythmic with cutoff&quot; &quot;0.2890625&quot;                      
+[1] &quot;amplitude of all &amp; rhythmic&quot; &quot;0.464183680553478&quot;           &quot;0.466915722872089&quot;          </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3luX1IgPC0gbWFrZWl0cmFpbihzeW4sIDAuMDUpIFxuYGBgIn0= -->
+<pre class="r"><code>syn_R &lt;- makeitrain(syn, 0.05) </code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwicGVyY2VudGFnZSByaHl0aG1pYyB3aXRoIGN1dG9mZlwiIFwiMC4yNzMwMDM0NzIyMjIyMjJcIiAgICAgICAgICAgICAgXG5bMV0gXCJhbXBsaXR1ZGUgb2YgYWxsICYgcmh5dGhtaWNcIiBcIjAuNzUxMDE3NzI0OTIzOTU2XCIgICAgICAgICAgIFwiMC42OTIwMDY0NDM5ODU4MjNcIiAgICAgICAgICBcbiJ9 -->
+<pre><code>[1] &quot;percentage rhythmic with cutoff&quot; &quot;0.273003472222222&quot;              
+[1] &quot;amplitude of all &amp; rhythmic&quot; &quot;0.751017724923956&quot;           &quot;0.692006443985823&quot;          </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuSF9wcm9wX1IgPC0gbWFrZWl0cmFpbihIX3Byb3AsIDAuMDUpIFxuYGBgIn0= -->
+<pre class="r"><code>H_prop_R &lt;- makeitrain(H_prop, 0.05) </code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwicGVyY2VudGFnZSByaHl0aG1pYyB3aXRoIGN1dG9mZlwiIFwiMC4xMTc2MjE1Mjc3Nzc3NzhcIiAgICAgICAgICAgICAgXG5bMV0gXCJhbXBsaXR1ZGUgb2YgYWxsICYgcmh5dGhtaWNcIiBcIjAuNjI5MTMyODMzOTg1ODI3XCIgICAgICAgICAgIFwiMC41OTQ0OTk0ODc0MzY1NFwiICAgICAgICAgICBcbiJ9 -->
+<pre><code>[1] &quot;percentage rhythmic with cutoff&quot; &quot;0.117621527777778&quot;              
+[1] &quot;amplitude of all &amp; rhythmic&quot; &quot;0.629132833985827&quot;           &quot;0.59449948743654&quot;           </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxsdG90YWxfUiA8LSBtYWtlaXRyYWluKGFsbF9wcm90X2FsbCwgMC4wNSkgXG5gYGAifQ== -->
+<pre class="r"><code>alltotal_R &lt;- makeitrain(all_prot_all, 0.05) </code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwicGVyY2VudGFnZSByaHl0aG1pYyB3aXRoIGN1dG9mZlwiIFwiMC4yMzc2OTM4MTMwMzYyNzlcIiAgICAgICAgICAgICAgXG5bMV0gXCJhbXBsaXR1ZGUgb2YgYWxsICYgcmh5dGhtaWNcIiBcIjAuNDczMzk3NDAzMDc4NDU4XCIgICAgICAgICAgIFwiMC40NzQxNzE3NjcyMjczMzlcIiAgICAgICAgICBcbiJ9 -->
+<pre><code>[1] &quot;percentage rhythmic with cutoff&quot; &quot;0.237693813036279&quot;              
+[1] &quot;amplitude of all &amp; rhythmic&quot; &quot;0.473397403078458&quot;           &quot;0.474171767227339&quot;          </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud3JpdGUuY3N2KHRvdGFsX1IsIFwibW1jIHByb3RlaW5zIGZpbHRlcmVkIHRvdGFsIFJBSU4uY3N2XCIsIHJvdy5uYW1lcyA9IEYpXG53cml0ZS5jc3Yoc3luX1IsIFwibW1jIHByb3RlaW5zIGZpbHRlcmVkIEgtc3luIFJBSU4uY3N2XCIsIHJvdy5uYW1lcyA9IEYpXG53cml0ZS5jc3YoSF9wcm9wX1IsIFwibW1jIHByb3RlaW5zIGZpbHRlcmVkIEgtcHJvcCBSQUlOLmNzdlwiLCByb3cubmFtZXMgPSBGKVxud3JpdGUuY3N2KGFsbHRvdGFsX1IsIFwibW1jIHByb3RlaW5zIGFsbCBub24tZmlsdGVyZWQgUkFJTi5jc3ZcIiwgcm93Lm5hbWVzID0gRilcblxuYGBgIn0= -->
+<pre class="r"><code>write.csv(total_R, &quot;mmc proteins filtered total RAIN.csv&quot;, row.names = F)
+write.csv(syn_R, &quot;mmc proteins filtered H-syn RAIN.csv&quot;, row.names = F)
+write.csv(H_prop_R, &quot;mmc proteins filtered H-prop RAIN.csv&quot;, row.names = F)
+write.csv(alltotal_R, &quot;mmc proteins all non-filtered RAIN.csv&quot;, row.names = F)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2NyZWF0ZSBmdW5jdGlvbiBmb3IgY2FsY3VsYXRpbmcgYXZlcmFnZSBmb2xkLWNobmFuZ2UgYW5kIGRvaW5nIEFOT1ZBXG5cbmF2RkNfYW5vdmEgPC0gZnVuY3Rpb24oZGZfUikge1xuZGZfUl9hdkZDIDwtIGRmX1JbMTo3XVxuI2NhbGN1bGF0ZSBhdmVyYWdlIG9mIHR3byByZXBsaWNhdGVzIGZvciBlYWNoIHByb3RlaW5cbmZvciAoaSBpbiAxOm5yb3coZGZfUl9hdkZDKSkge1xuZWcgPC0gZGZfUltpLCA4OjIzXVxuZGF5MWF2IDwtIGMocm93TWVhbnMoZWdbMToyXSksIHJvd01lYW5zKGVnWzM6NF0pLCByb3dNZWFucyhlZ1s1OjZdKSwgcm93TWVhbnMoZWdbNzo4XSkpXG5lZzIgPC0gZWdbOToxNl1cbmRheTJhdiA8LSBjKHJvd01lYW5zKGVnMlsxOjJdKSwgcm93TWVhbnMoZWcyWzM6NF0pLCByb3dNZWFucyhlZzJbNTo2XSksIHJvd01lYW5zKGVnMls3OjhdKSlcbmRmX1JfYXZGQ1tpLCA4OjE1XSA8LSBjKGRheTFhdiwgZGF5MmF2KSAjcmVjb3JkIHRoZSBhdmVyYWdlXG4jY2FsY3VsYXRlIGZvbGQtY2hhbmdlcywgdGhlbiBhdmVyYWdlIHRob3NlXG5GQzEgPC0gbWF4KGRheTFhdikvbWluKGRheTFhdilcbkZDMiA8LSBtYXgoZGF5MmF2KS9taW4oZGF5MmF2KVxuZGZfUl9hdkZDW2ksIDE2OjE4XSA8LSBjKEZDMSwgRkMyLCBtZWFuKGMoRkMxLCBGQzIpKSlcbiNub3cgZG8gYW5vdmFcbmVnZGYgPC0gZ2F0aGVyKGRmX1JfYXZGQ1tpLCA4OjE1XSlcbmVnZGYkdGltZSA8LSByZXAocGFzdGUwKFwidFwiLCBzZXEoMSwgNCwgMSkpLCAyKVxuI25lZWQgdG8gbG9nMiB0aGUgdmFsdWVzIVxuZWdkZiR2YWx1ZWxvZzIgPC0gbG9nMihlZ2RmJHZhbHVlKVxucmVzLmFvdiA8LSBhb3YodmFsdWVsb2cyIH4gdGltZSwgZGF0YSA9IGVnZGYpXG5kZl9SX2F2RkNbaSxcImFub3ZhX3B2YWxcIl0gPC0gc3VtbWFyeShyZXMuYW92KVtbMV1dWzEsNV1cbn1cbiNyZW5hbWUgY29sdW1ucyBhbmQgY3JlYXRlIG1vcmUgdXNlZnVsIG9uZXNcbmNvbG5hbWVzKGRmX1JfYXZGQylbODoxNV0gPC0gcGFzdGUwKFwidFwiLCBzZXEoMSwgOCwgMSksIFwiLmF2XCIpXG5jb2xuYW1lcyhkZl9SX2F2RkMpWzE2OjE4XSA8LSBjKFwiRkNkYXkxXCIsIFwiRkNkYXkyXCIsIFwiRkNhdlwiKVxuXG5kZl9SX2F2RkMkYW5vdmFfQkhhZGpwdmFsIDwtIHAuYWRqdXN0KGRmX1JfYXZGQyRhbm92YV9wdmFsLCBtZXRob2Q9XCJCSFwiKVxucHJpbnQoYyhcImFub3ZhIG5vbi1hZGogcDwwLjA1XCIsIG5yb3coc3Vic2V0KGRmX1JfYXZGQywgYW5vdmFfcHZhbDwwLjA1KSkvbnJvdyhkZl9SX2F2RkMpKSlcbnByaW50KGMoXCJtZWRpYW4gZm9sZC1jaGFuZ2VcIiwgbWVkaWFuKGRmX1JfYXZGQyRGQ2F2KSkpXG5yZXR1cm4oZGZfUl9hdkZDKVxufVxuXG5zeW5fUl9hdkZDIDwtIGF2RkNfYW5vdmEoc3luX1IpICM3LjglIHNpZ24gd2l0aCBhbm92YSwgMS40NCBtZWRpYW4gZm9sZC1jaGFuZ2VcbmBgYCJ9 -->
+<pre class="r"><code>#create function for calculating average fold-chnange and doing ANOVA
+
+avFC_anova &lt;- function(df_R) {
+df_R_avFC &lt;- df_R[1:7]
+#calculate average of two replicates for each protein
+for (i in 1:nrow(df_R_avFC)) {
+eg &lt;- df_R[i, 8:23]
+day1av &lt;- c(rowMeans(eg[1:2]), rowMeans(eg[3:4]), rowMeans(eg[5:6]), rowMeans(eg[7:8]))
+eg2 &lt;- eg[9:16]
+day2av &lt;- c(rowMeans(eg2[1:2]), rowMeans(eg2[3:4]), rowMeans(eg2[5:6]), rowMeans(eg2[7:8]))
+df_R_avFC[i, 8:15] &lt;- c(day1av, day2av) #record the average
+#calculate fold-changes, then average those
+FC1 &lt;- max(day1av)/min(day1av)
+FC2 &lt;- max(day2av)/min(day2av)
+df_R_avFC[i, 16:18] &lt;- c(FC1, FC2, mean(c(FC1, FC2)))
+#now do anova
+egdf &lt;- gather(df_R_avFC[i, 8:15])
+egdf$time &lt;- rep(paste0(&quot;t&quot;, seq(1, 4, 1)), 2)
+#need to log2 the values!
+egdf$valuelog2 &lt;- log2(egdf$value)
+res.aov &lt;- aov(valuelog2 ~ time, data = egdf)
+df_R_avFC[i,&quot;anova_pval&quot;] &lt;- summary(res.aov)[[1]][1,5]
+}
+#rename columns and create more useful ones
+colnames(df_R_avFC)[8:15] &lt;- paste0(&quot;t&quot;, seq(1, 8, 1), &quot;.av&quot;)
+colnames(df_R_avFC)[16:18] &lt;- c(&quot;FCday1&quot;, &quot;FCday2&quot;, &quot;FCav&quot;)
+
+df_R_avFC$anova_BHadjpval &lt;- p.adjust(df_R_avFC$anova_pval, method=&quot;BH&quot;)
+print(c(&quot;anova non-adj p&lt;0.05&quot;, nrow(subset(df_R_avFC, anova_pval&lt;0.05))/nrow(df_R_avFC)))
+print(c(&quot;median fold-change&quot;, median(df_R_avFC$FCav)))
+return(df_R_avFC)
+}
+
+syn_R_avFC &lt;- avFC_anova(syn_R) #7.8% sign with anova, 1.44 median fold-change</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiYW5vdmEgbm9uLWFkaiBwPDAuMDVcIiBcIjAuMDc4MTI1XCIgICAgICAgICAgICBcblsxXSBcIm1lZGlhbiBmb2xkLWNoYW5nZVwiIFwiMS4zODcyMzg3Njk1MDczMVwiICBcbiJ9 -->
+<pre><code>[1] &quot;anova non-adj p&lt;0.05&quot; &quot;0.078125&quot;            
+[1] &quot;median fold-change&quot; &quot;1.38723876950731&quot;  </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudG90X1JfYXZGQyA8LSBhdkZDX2Fub3ZhKHRvdGFsX1IpICM5LjIlIHNpZ24gd2l0aCBhbm92YSwgMS4yMyBtZWRpYW4gZm9sZC1jaGFuZ2VcbmBgYCJ9 -->
+<pre class="r"><code>tot_R_avFC &lt;- avFC_anova(total_R) #9.2% sign with anova, 1.23 median fold-change</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiYW5vdmEgbm9uLWFkaiBwPDAuMDVcIiBcIjAuMDkyMDEzODg4ODg4ODg4OVwiICBcblsxXSBcIm1lZGlhbiBmb2xkLWNoYW5nZVwiIFwiMS4yMjc1NTkyMTg2NjY2NVwiICBcbiJ9 -->
+<pre><code>[1] &quot;anova non-adj p&lt;0.05&quot; &quot;0.0920138888888889&quot;  
+[1] &quot;median fold-change&quot; &quot;1.22755921866665&quot;  </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud3JpdGUuY3N2KHN5bl9SX2F2RkMsIFwibW1jIHByb3RlaW5zIHN5biBSQUlOIGF2RkMgQU5PVkEuY3N2XCIsIHJvdy5uYW1lcyA9IEYpXG53cml0ZS5jc3YodG90X1JfYXZGQywgXCJtbWMgcHJvdGVpbnMgdG90YWwgUkFJTiBhdkZDIEFOT1ZBLmNzdlwiLCByb3cubmFtZXMgPSBGKVxuXG5cbmBgYCJ9 -->
+<pre class="r"><code>write.csv(syn_R_avFC, &quot;mmc proteins syn RAIN avFC ANOVA.csv&quot;, row.names = F)
+write.csv(tot_R_avFC, &quot;mmc proteins total RAIN avFC ANOVA.csv&quot;, row.names = F)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiU0lMQUMtVE1UIHRpbWVjb3Vyc2UgLSB0YWtpbmcgbm9ybWFsaXNlZCBkYXRhIGZvciByaHl0aG1pY2l0eSBhbmFseXNpcyIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKCmBgYHtyfQojc2V0dXAKCiNjbGVhciB5b3VyIHdvcmtzcGFjZQpybShsaXN0PWxzKCkpCgojTG9hZCB1c2VmdWwgcGFja2FnZXMKCmlmICghcmVxdWlyZSgidGlkeXZlcnNlIikpIHsKICBpbnN0YWxsLnBhY2thZ2VzKCJ0aWR5dmVyc2UiLCBkZXBlbmRlbmNpZXMgPSBUUlVFKQogIGxpYnJhcnkodGlkeXZlcnNlKQp9CgoKaWYgKCFyZXF1aXJlKCJyYWluIikpIHsKICBCaW9jTWFuYWdlcjo6aW5zdGFsbCgicmFpbiIpCiAgbGlicmFyeShyYWluKQp9CgoKCiNtYWtlIGEgbGlzdCBvZiBhbGwgdGhlIC5jc3YgZmlsZXMgaW4geW91ciB3b3JraW5nIGRpcmVjdG9yeSBqdXN0IHNvIHlvdSBjYW4gc2VlIHdoYXQncyBnb2luZyBvbgpYID0gbGlzdC5maWxlcygiLiIsIi5jc3YiKQpYCgojbG9hZCBpbiB0aGUgZ3JvdXBlZCBwcm90ZWlucyArIHRoZSByYXRpb3MgY2FsY3VsYXRlZCAoZG8gUkFJTiBvbiB0aGF0IGZvciBub3cpCgphbGxfcHJvdCA8LSByZWFkLmNzdigibW1jIHByb3RlaW5zIEhMIHRvZ2V0aGVyIFNMIG5vcm1hbGlzZWQuY3N2Iiwgc3RyaW5nc0FzRmFjdG9ycyA9IEYpCmNvbG5hbWVzKGFsbF9wcm90KQoKI2FsbF90b3RhbCAtIGkuZS4gc3VtbWluZyBIICYgTCwgdmVyeSBzaW1wbGUKYWxsX3Byb3RfYWxsIDwtIHJlYWQuY3N2KCJtbWMgcHJvdGVpbnMgQUxMIFNMIG5vcm1hbGlzZWQuY3N2Iiwgc3RyaW5nc0FzRmFjdG9ycyA9IEYpCgpgYGAKCgoKYGBge3J9CiNjcmVhdGUgc2VwYXJhdGUgZGF0YSB0YWJsZXMgZm9yIHN5bnRoZXNpcywgdG90YWwKCnN5biA8LSBhbGxfcHJvdFtjKDE6MywgMjI6MzcpXSAjc3ludGhlc2lzIC0ganVzdCB0aGUgaGVhdnkgaW4gc2lsYWMgc2FtcGxlcwpIX3Byb3AgPC0gYWxsX3Byb3RbYygxOjMsIDU0OjY5KV0gI0hlYXZ5L1RvdGFsID0gcHJvcG9ydGlvbiBvZiBoZWF2eSwgcmVsYXRpdmUgdHVybm92ZXIKdG90YWwgPC0gIGFsbF9wcm90W2MoMTozLCAzODo1MyldCgpgYGAKCmBgYHtyfQojZnVuY3Rpb24gZm9yIFJBSU4KCm1ha2VpdHJhaW4gPC0gZnVuY3Rpb24oZGYsIHBjdXRvZmYpIHsKICBSQUlOX2luIDwtIHQoZGZbNDoxOV0pICNUcmFuc3Bvc2UgZGF0YSBvbmx5IGNvbHVtbnMsIHRvIGNyZWF0ZSB0aGUgaW5wdXRzIGZvciBSQUlOCiAgUkFJTl9vdXQgPC0gYXMuZGF0YS5mcmFtZShtYXRyaXgoMCxucm93KFJBSU5faW4pLCA0KSkgI2NyZWF0ZSBtYXRyaXggZm9yIFJBSU4gb3V0cHV0CiAgI1JBSU4gcGFyYW1ldGVycwogIHN0ZXAgPSA2ICNudW1iZXIgb2YgaG91cnMgYmV0d2VlbiB0aW1lcG9pbnRzCiAgcGVyaW9kID0gMjQgI3NwZWNpZnkgcGVyaW9kIGxlbmd0aCB0byB0ZXN0IGZvcgogIHJlcCA9IDIgI251bWJlciBvZiBiaW9sb2dpY2FsIHJlcGxpY2F0ZXMKICAjZG8gcmFpbgogIFJBSU5fb3V0IDwtIHJhaW4oUkFJTl9pbiwgc3RlcCwgcGVyaW9kLCBuci5zZXJpZXMgPSByZXApCiAgI2FkZCBiYWNrIGdlbmUgbmFtZXMgYW5kIG90aGVyIHByb3RlaW4gaW5mbwogIFJBSU5fb3V0IDwtIGNiaW5kKGRmWzE6M10sIFJBSU5fb3V0LCBkZls0OjE5XSkKICAjcHJpbnQgbGlzdCAmIHByb3BvcnRpb24gb2YgcHJvdGVpbnMgInJoeXRobWljIiwgZWcgPDAuMDUgcCAoYnV0IGNvdWxkIGNoYW5nZSkKICBzdWJzZXQoUkFJTl9vdXQsIHBWYWw8MC4wNSkKICBwcmludChjKCJwZXJjZW50YWdlIHJoeXRobWljIHdpdGggY3V0b2ZmIiwgbnJvdyhzdWJzZXQoUkFJTl9vdXQsIHBWYWw8cGN1dG9mZikpL25yb3coUkFJTl9vdXQpKSkKICAjYWRkIHJlbGF0aXZlIGFtcGxpdHVkZSBjYWxjdWxhdGlvbiBhdCBvbmNlICsgYmFzZWxpbmUgKGF2ZXJhZ2UgZXhwcmVzc2lvbikKICBSQUlOX291dCRBdl9leHByIDwtIGFwcGx5KFJBSU5fb3V0Wzg6MjNdLCAxLCBtZWFuKQogIFJBSU5fb3V0JEFtcGxpdHVkZSA8LSBhcHBseShSQUlOX291dFs4OjIzXSwgMSwgZnVuY3Rpb24oeCkgKChtYXgoeCktbWluKHgpKS9tZWFuKHgpKSkKICBwcmludChjKCJhbXBsaXR1ZGUgb2YgYWxsICYgcmh5dGhtaWMiLCBtZWRpYW4oUkFJTl9vdXQkQW1wbGl0dWRlKSwgbWVkaWFuKHN1YnNldChSQUlOX291dCwgcFZhbDxwY3V0b2ZmKSRBbXBsaXR1ZGUpKSkKICAjYWRkIHZhcmlhbmNlCiAgUkFJTl9vdXQkQ1YgPC0gYXBwbHkoUkFJTl9vdXRbODoyM10sIDEsIGZ1bmN0aW9uKHgpIHNkKGFzLm51bWVyaWMoeCkpL21lYW4oYXMubnVtZXJpYyh4KSkpCiAgcmV0dXJuKFJBSU5fb3V0KSB9CgogIAoKYGBgCgoKCmBgYHtyfQojYWxsIHRvYWxzCgp0b3RhbF9SIDwtIG1ha2VpdHJhaW4odG90YWwsIDAuMDUpIApzeW5fUiA8LSBtYWtlaXRyYWluKHN5biwgMC4wNSkgCkhfcHJvcF9SIDwtIG1ha2VpdHJhaW4oSF9wcm9wLCAwLjA1KSAKYWxsdG90YWxfUiA8LSBtYWtlaXRyYWluKGFsbF9wcm90X2FsbCwgMC4wNSkgCgp3cml0ZS5jc3YodG90YWxfUiwgIm1tYyBwcm90ZWlucyBmaWx0ZXJlZCB0b3RhbCBSQUlOLmNzdiIsIHJvdy5uYW1lcyA9IEYpCndyaXRlLmNzdihzeW5fUiwgIm1tYyBwcm90ZWlucyBmaWx0ZXJlZCBzeW4gUkFJTi5jc3YiLCByb3cubmFtZXMgPSBGKQp3cml0ZS5jc3YoSF9wcm9wX1IsICJtbWMgcHJvdGVpbnMgZmlsdGVyZWQgcHJvcEh0b1QgUkFJTi5jc3YiLCByb3cubmFtZXMgPSBGKQp3cml0ZS5jc3YoYWxsdG90YWxfUiwgIm1tYyBwcm90ZWlucyBhbGwgbm9uLWZpbHRlcmVkIFJBSU4uY3N2Iiwgcm93Lm5hbWVzID0gRikKCmBgYAoKCmBgYHtyfQojY3JlYXRlIGZ1bmN0aW9uIGZvciBjYWxjdWxhdGluZyBhdmVyYWdlIGZvbGQtY2huYW5nZSBhbmQgZG9pbmcgQU5PVkEKCmF2RkNfYW5vdmEgPC0gZnVuY3Rpb24oZGZfUikgewpkZl9SX2F2RkMgPC0gZGZfUlsxOjddCiNjYWxjdWxhdGUgYXZlcmFnZSBvZiB0d28gcmVwbGljYXRlcyBmb3IgZWFjaCBwcm90ZWluCmZvciAoaSBpbiAxOm5yb3coZGZfUl9hdkZDKSkgewplZyA8LSBkZl9SW2ksIDg6MjNdCmRheTFhdiA8LSBjKHJvd01lYW5zKGVnWzE6Ml0pLCByb3dNZWFucyhlZ1szOjRdKSwgcm93TWVhbnMoZWdbNTo2XSksIHJvd01lYW5zKGVnWzc6OF0pKQplZzIgPC0gZWdbOToxNl0KZGF5MmF2IDwtIGMocm93TWVhbnMoZWcyWzE6Ml0pLCByb3dNZWFucyhlZzJbMzo0XSksIHJvd01lYW5zKGVnMls1OjZdKSwgcm93TWVhbnMoZWcyWzc6OF0pKQpkZl9SX2F2RkNbaSwgODoxNV0gPC0gYyhkYXkxYXYsIGRheTJhdikgI3JlY29yZCB0aGUgYXZlcmFnZQojY2FsY3VsYXRlIGZvbGQtY2hhbmdlcywgdGhlbiBhdmVyYWdlIHRob3NlCkZDMSA8LSBtYXgoZGF5MWF2KS9taW4oZGF5MWF2KQpGQzIgPC0gbWF4KGRheTJhdikvbWluKGRheTJhdikKZGZfUl9hdkZDW2ksIDE2OjE4XSA8LSBjKEZDMSwgRkMyLCBtZWFuKGMoRkMxLCBGQzIpKSkKI25vdyBkbyBhbm92YQplZ2RmIDwtIGdhdGhlcihkZl9SX2F2RkNbaSwgODoxNV0pCmVnZGYkdGltZSA8LSByZXAocGFzdGUwKCJ0Iiwgc2VxKDEsIDQsIDEpKSwgMikKI25lZWQgdG8gbG9nMiB0aGUgdmFsdWVzIQplZ2RmJHZhbHVlbG9nMiA8LSBsb2cyKGVnZGYkdmFsdWUpCnJlcy5hb3YgPC0gYW92KHZhbHVlbG9nMiB+IHRpbWUsIGRhdGEgPSBlZ2RmKQpkZl9SX2F2RkNbaSwiYW5vdmFfcHZhbCJdIDwtIHN1bW1hcnkocmVzLmFvdilbWzFdXVsxLDVdCn0KI3JlbmFtZSBjb2x1bW5zIGFuZCBjcmVhdGUgbW9yZSB1c2VmdWwgb25lcwpjb2xuYW1lcyhkZl9SX2F2RkMpWzg6MTVdIDwtIHBhc3RlMCgidCIsIHNlcSgxLCA4LCAxKSwgIi5hdiIpCmNvbG5hbWVzKGRmX1JfYXZGQylbMTY6MThdIDwtIGMoIkZDZGF5MSIsICJGQ2RheTIiLCAiRkNhdiIpCgpkZl9SX2F2RkMkYW5vdmFfQkhhZGpwdmFsIDwtIHAuYWRqdXN0KGRmX1JfYXZGQyRhbm92YV9wdmFsLCBtZXRob2Q9IkJIIikKcHJpbnQoYygiYW5vdmEgbm9uLWFkaiBwPDAuMDUiLCBucm93KHN1YnNldChkZl9SX2F2RkMsIGFub3ZhX3B2YWw8MC4wNSkpL25yb3coZGZfUl9hdkZDKSkpCnByaW50KGMoIm1lZGlhbiBmb2xkLWNoYW5nZSIsIG1lZGlhbihkZl9SX2F2RkMkRkNhdikpKQpyZXR1cm4oZGZfUl9hdkZDKQp9CgpzeW5fUl9hdkZDIDwtIGF2RkNfYW5vdmEoc3luX1IpICM3LjglIHNpZ24gd2l0aCBhbm92YSwgMS40NCBtZWRpYW4gZm9sZC1jaGFuZ2UKdG90X1JfYXZGQyA8LSBhdkZDX2Fub3ZhKHRvdGFsX1IpICM5LjIlIHNpZ24gd2l0aCBhbm92YSwgMS4yMyBtZWRpYW4gZm9sZC1jaGFuZ2UKCndyaXRlLmNzdihzeW5fUl9hdkZDLCAibW1jIHByb3RlaW5zIHN5biBSQUlOIGF2RkMgQU5PVkEuY3N2Iiwgcm93Lm5hbWVzID0gRikKd3JpdGUuY3N2KHRvdF9SX2F2RkMsICJtbWMgcHJvdGVpbnMgdG90YWwgUkFJTiBhdkZDIEFOT1ZBLmNzdiIsIHJvdy5uYW1lcyA9IEYpCgoKYGBgCgoKYGBge3J9CgoKYGBgCgoKCgo=</div>
 
 
 
@@ -621,7 +529,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("2w RAIN and ANOVA.Rmd");
+  window.initializeSourceEmbed("2mmc RAIN and ANOVA.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>

@@ -1,0 +1,192 @@
+---
+title: "pSILAC-TMT complexes - comparing with annotated complexes databases, relative turnover & fold-change clustering"
+output: html_notebook
+---
+
+Plotting complexes
+
+```{r}
+
+
+#clear your workspace
+rm(list=ls())
+#Load useful packages
+
+if (!require("tidyverse")) {
+  install.packages("tidyverse", dependencies = TRUE)
+  library(tidyverse)
+}
+
+
+if (!require("ggplot2")) {
+  install.packages("ggplot2", dependencies = TRUE)
+  library(ggplot2)
+}
+
+
+if (!require("reshape2")) {
+  install.packages("reshape2")
+  library(reshape2)
+} 
+
+#make a list of all the .csv files in your working directory just so you can see what's going on
+X = list.files(".",".csv")
+
+#Load data from previous analysis
+
+#synthesis/heavy analysis RAIN & average fold-change
+syn_R_avFC <- read.csv("mmc proteins syn RAIN avFC ANOVA.csv", stringsAsFactors = F)
+
+#merge together with proportion/relative turnover data
+synprop_R <- read.csv("mmc proteins filtered propHtoT RAIN.csv", stringsAsFactors = F)
+
+syn_R_avFC <- synprop_R %>% select(Leading.razor.protein, Ave_turnover=Av_expr) %>% merge(syn_R_avFC, by="Leading.razor.protein")
+
+```
+
+
+```{r}
+#get which proteins belong to annotated protein complexes; take a list from Ori et al 2016 suppementary, as it combined CORUM + manual annotation (CORUM alone more redundancies & incosistencies)
+
+#need first to translate ensembl IDs, from mouse to human to be able to match
+#uniprot to human ensembl version of all detected proteins - got that from gOrth tool in gProfiler
+mousetohuman_id <- read.csv("gProfiler_mmusculus_hsapiens_filtered proteins.csv", stringsAsFactors = F)
+mousetohuman_id <- mousetohuman_id %>% dplyr::rename(Uniprot_ID = initial_alias)
+
+#load in complex list, taken from ori et al 2016
+complexes_list <- read.csv("ori et al complexes all.csv", stringsAsFactors = F)
+complexes_list
+colnames(complexes_list)
+compl_l_bycomplex <- complexes_list %>% pull(Member.identifiers..human.Ensembl.gene.)
+
+#function to get ensembl (ensg) id & complexes for the data
+ensg_complex <- function(df) {
+  df_ensg <- mousetohuman_id %>% select(Uniprot_ID, ortholog_ensg) %>% merge(df, by.x="Uniprot_ID", by.y="Leading.razor.protein")
+  cl <- lapply(df_ensg$ortholog_ensg, function(x) complexes_list[grepl(x, complexes_list$Member.identifiers..human.Ensembl.gene.),"Complex.Name"])
+  cl[sapply(cl, function(x) length(x)==0)] <- NA
+df_ensg$complex <- cl
+df_ensg <- df_ensg %>% unnest(complex)
+return(df_ensg)
+}
+
+syn_R_ensg <- ensg_complex(syn_R_avFC)
+syn_R_ensg
+write.csv(syn_R_ensg, "mmc proteins syn FC and complexes.csv", row.names = F)
+
+
+```
+
+
+```{r}
+
+#theme for ggplots
+plottheme = theme(
+  # Remove panel border
+  panel.border = element_blank(),  
+  # Remove panel grid lines
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  # Remove panel background
+  panel.background = element_blank(),
+  # Add axis line
+  axis.line = element_line(colour = "black"),
+  axis.text=element_text(colour="black", size=11),
+  axis.title=element_text(size=14),
+  )
+
+
+```
+
+
+```{r}
+#selected complexes
+selected_compl3 <- c("cytoplasmic ribosomal small subunit|chaperonin-containing T-complex|Large Drosha complex|RNA polymerase II core complex")
+
+eg_complexes_rhy <- syn_R_ensg %>% filter(str_detect(syn_R_ensg$complex, selected_compl3)) %>% filter(pVal<0.05)
+
+ggplot(data=subset(syn_R_ensg, pVal<0.05)) + geom_point(aes(x=log2(FCav), y=log2(Ave_turnover))) + plottheme + geom_point(data=eg_complexes, aes(label=Gene.names, x=log2(FCav), y=log2(Ave_turnover), colour=complex), cex=3) + labs(y="log2 turnover", x="log2 fold-change in synthesis", subtitle="rhythmic only")
+
+ggplot(data=syn_R_ensg) + geom_point(aes(x=(FCav), y=(Ave_turnover))) + plottheme + geom_point(data=eg_complexes_rhy, aes(label=Gene.names, x=(FCav), y=(Ave_turnover), colour=complex), cex=3) + labs(y="relative turnover", x="fold-change in synthesis", subtitle="all, rhythmic larger") + geom_point(data=syn_R_ensg %>% filter(str_detect(syn_R_ensg$complex, selected_compl3)), aes(label=Gene.names, x=(FCav), y=(Ave_turnover), colour=complex)) + 
+  scale_x_continuous(trans='log2') + scale_y_continuous(trans='log10')
+
+ggsave("selected complexes turnover vs FC syn rhythmic highlighted.pdf", width=6, height=4)
+
+```
+
+```{r}
+#try to avergage proteins belonging to each comples & calculate error
+
+selected_compl3 <- c("cytoplasmic ribosomal small subunit|chaperonin-containing T-complex|Large Drosha complex|RNA polymerase II core complex")
+eg_complexes <- syn_R_ensg %>% filter(str_detect(syn_R_ensg$complex, selected_compl3))
+
+#standard error on mean
+sem <- function(x) sd(x)/sqrt(length(x))
+#calculate for both fold-chaneg and relative turnvoer
+complexes_sum <- eg_complexes %>% group_by(complex) %>% summarise(overall_turnover=median(Ave_turnover), stand_dev_turnover=sd(Ave_turnover), sem_turnover=sem(Ave_turnover), average_FC_syn=mean(FCav), stand_dev_FC=sd(FCav), sem_FC=sem(FCav))
+
+
+eg_complexes %>% filter(complex=="chaperonin-containing T-complex")
+
+complexes_sum
+
+
+#error bars both ways, with SEM
+ggplot(data=syn_R_ensg) + geom_point(aes(x=(FCav), y=(Ave_turnover)), colour="gray66") + 
+  plottheme + 
+  geom_point(data=complexes_sum, aes(x=(average_FC_syn), y=(overall_turnover), colour=complex), cex=5) + 
+  labs(y=" turnover", x=" fold-change in synthesis", subtitle="`all, rhythmic larger") + 
+  geom_errorbar(data=complexes_sum, aes(ymin = (overall_turnover) - (sem_turnover), ymax = (overall_turnover) + (sem_turnover), xmin=average_FC_syn-sem_FC, xmax=average_FC_syn+sem_FC, x=(average_FC_syn), y=(overall_turnover), color = complex), width = .2) + 
+  geom_errorbar(data=complexes_sum, aes(xmin=average_FC_syn-sem_FC, xmax=average_FC_syn+sem_FC, x=(average_FC_syn), y=(overall_turnover), color = complex), width = .2) + 
+  scale_x_continuous(trans='log2') + scale_y_continuous(trans="log10") + xlim(1, 3.5)
+
+ggsave("selected complexes averaged and error turnover vs FC syn.pdf", width=9, height=6)
+
+   
+```
+
+```{r}
+#check that standard deviation within complexes is lower than by chnace
+overall_sd <- sd(syn_R_ensg$Ave_turnover) #0.14
+
+#summary average turnover of complexes with more than 3 memebrs
+syn_compl <- syn_R_ensg %>% group_by(complex) %>% summarise(sd=sd(Ave_turnover), n=n()) %>% na.omit() %>% filter(n>3)
+
+#create same structure dataframe but pick "subunits" randomly
+randomised <- c()
+for (i in 1:nrow(syn_compl)) {
+  subunit_number <- as.numeric(syn_compl[i, "n"])
+  a <- sample(syn_R_ensg$Ave_turnover, subunit_number)
+  randomised[i] <- sd(a)
+}
+randomised 
+
+median(randomised) #0.11
+median(syn_compl$sd) #0.09
+wilcox.test(randomised, syn_compl$sd) #p=0.002-0.0066
+ggplot() + geom_boxplot(aes(y=randomised, x="random")) + geom_boxplot(aes(y=syn_compl$sd, x="proteins detecetd in complexes")) + labs(y="standard deviation", subtitle="do proteins in complexes have more coordinated average turnover than expecetd by chance? \nyes, p=0.0066") + plottheme
+ggsave("standard deviation complexes vs random.pdf", width=5, height=5)
+
+```
+
+```{r}
+#drafts
+#all & rythmic, what kind of complexes have here?
+
+syn_R_ensg %>% group_by(complex)  %>% count() %>% arrange(desc(n))
+
+colnames(complexes_list)
+compl_no <- complexes_list %>% select(complex=Complex.Name, No_members_known = X..of.members)
+
+all_compl_detected <- syn_R_ensg %>% group_by(complex)  %>% count() %>% merge(compl_no, by="complex") %>% mutate(Prop_detected=n/No_members_known) %>% arrange(desc(Prop_detected))
+all_compl_detected
+
+syn_rhy_compl <- syn_R_ensg %>% filter(pVal<0.05 | anova_pval<0.05) %>% group_by(complex)  %>% count() %>% arrange(desc(n))
+
+syn_rhy_compl <- syn_R_ensg %>% filter(pVal<0.05) %>% group_by(complex)  %>% count() %>% arrange(desc(n))
+
+complexes_grouped <- merge(all_compl_detected, syn_rhy_compl, by="complex", suffixes = c(".all", ".rhy")) %>% mutate(Prop_rhythmic=n.rhy/n.all) %>% filter(n.all>2) %>% arrange(desc(Prop_rhythmic))
+
+complexes_grouped 
+
+```
+

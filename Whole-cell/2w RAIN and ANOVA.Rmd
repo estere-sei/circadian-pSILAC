@@ -81,7 +81,6 @@ makeitrain <- function(df, pcutoff) {
 
 
 ```{r}
-#all toals
 
 total_R <- makeitrain(total, 0.05) #6.2% rhy, 25% RA
 syn_R <- makeitrain(syn, 0.05) #5.9% rhy, 30% RA
